@@ -4,41 +4,51 @@ require './db_connection.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $request = explode('/', trim($_SERVER['PATH_INFO'], '/'));
-$resource = array_shift($request); // Lấy bảng cần thao tác
-$id = array_shift($request); // Lấy ID nếu có
+$resource = array_shift($request); // Get the table to operate on
+$id = array_shift($request); // Get the ID if provided
 
-// Xác định bảng và trường khóa chính
-$table = '';
-$primaryKey = '';
+// Map table names to primary key columns
+$tableMap = [
+    'customer' => 'customer_id',
+    'manager' => 'empolyeeID',
+    'product' => 'product_id',
+    'order_' => 'order_id',
+    'promotion_code' => 'code_id',
+    'cart' => 'cart_id',
+    'create_' => ['cart_id', 'customer_id'],
+    'make' => ['order_id', 'customer_id'],
+    'apply_for' => ['order_id', 'promotion_code_id'],
+    'contain' => ['order_id', 'product_id'],
+    'consisted' => ['cart_id', 'product_id'],
+    'rate' => ['customer_id', 'product_id'],
+    'own' => ['customer_id', 'promotion_code_id'],
+    'review' => ['product_id', 'ordinal_number']
+];
 
-switch ($resource) {
-    case 'customer':
-        $table = 'customer';
-        $primaryKey = 'customer_id';
-        break;
-    case 'manager':
-        $table = 'manager';
-        $primaryKey = 'empolyeeID';
-        break;
-    case 'product':
-        $table = 'product';
-        $primaryKey = 'product_id';
-        break;
-    default:
-        http_response_code(404);
-        echo json_encode(['error' => 'Resource not found']);
-        exit;
+// Determine the table and primary key(s)
+$table = $resource;
+$primaryKey = $tableMap[$resource];
+if (is_array($primaryKey)) {
+    $primaryKeyCount = count($primaryKey);
+} else {
+    $primaryKeyCount = 1;
 }
 
-// Xử lý các phương thức HTTP
+// Handle HTTP methods
 if ($method == 'GET' && !$id) {
-    // Lấy tất cả các bản ghi trong bảng
+    // Get all records from the table
     $stmt = $pdo->query("SELECT * FROM $table");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 } elseif ($method == 'GET' && $id) {
-    // Lấy một bản ghi theo ID
-    $stmt = $pdo->prepare("SELECT * FROM $table WHERE $primaryKey = ?");
-    $stmt->execute([$id]);
+    // Get a single record by ID
+    if ($primaryKeyCount == 1) {
+        $stmt = $pdo->prepare("SELECT * FROM $table WHERE $primaryKey = ?");
+        $stmt->execute([$id]);
+    } else {
+        $idParts = explode(',', $id);
+        $stmt = $pdo->prepare("SELECT * FROM $table WHERE " . implode(' = ? AND ', $primaryKey) . " = ?");
+        $stmt->execute(array_merge($idParts, $idParts));
+    }
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($record) {
         echo json_encode($record);
@@ -47,40 +57,50 @@ if ($method == 'GET' && !$id) {
         echo json_encode(['error' => ucfirst($resource) . ' not found']);
     }
 } elseif ($method == 'POST') {
-    // Tạo mới một bản ghi
+    // Create a new record
     $data = json_decode(file_get_contents("php://input"), true);
-    
-    // Xây dựng các câu truy vấn dựa trên bảng
-    if ($table == 'customer') {
-        $stmt = $pdo->prepare("INSERT INTO customer (name_, password_, username, gender, birthday, email) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$data['name'], $data['password'], $data['username'], $data['gender'], $data['birthday'], $data['email']]);
-    } elseif ($table == 'manager') {
-        $stmt = $pdo->prepare("INSERT INTO manager (name_, password_, username, gender, birthday, email) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$data['name'], $data['password'], $data['username'], $data['gender'], $data['birthday'], $data['email']]);
-    } elseif ($table == 'product') {
-        $stmt = $pdo->prepare("INSERT INTO product (name_, price, color, descriptioin, weight, size, quantity, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$data['name'], $data['price'], $data['color'], $data['description'], $data['weight'], $data['size'], $data['quantity'], $data['category']]);
-    }
+
+    $columns = array_keys($data);
+    $values = array_values($data);
+
+    $sql = "INSERT INTO $table (" . implode(', ', $columns) . ") VALUES (" . str_repeat('?, ', count($columns) - 1) . '?)';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($values);
+
     echo json_encode(['message' => ucfirst($resource) . ' created', 'id' => $pdo->lastInsertId()]);
 } elseif ($method == 'PUT' && $id) {
-    // Cập nhật bản ghi
+    // Update a record
     $data = json_decode(file_get_contents("php://input"), true);
-    
-    if ($table == 'customer') {
-        $stmt = $pdo->prepare("UPDATE customer SET name_ = ?, password_ = ?, username = ?, gender = ?, birthday = ?, email = ? WHERE customer_id = ?");
-        $stmt->execute([$data['name'], $data['password'], $data['username'], $data['gender'], $data['birthday'], $data['email'], $id]);
-    } elseif ($table == 'manager') {
-        $stmt = $pdo->prepare("UPDATE manager SET name_ = ?, password_ = ?, username = ?, gender = ?, birthday = ?, email = ? WHERE empolyeeID = ?");
-        $stmt->execute([$data['name'], $data['password'], $data['username'], $data['gender'], $data['birthday'], $data['email'], $id]);
-    } elseif ($table == 'product') {
-        $stmt = $pdo->prepare("UPDATE product SET name_ = ?, price = ?, color = ?, descriptioin = ?, weight = ?, size = ?, quantity = ?, category = ? WHERE product_id = ?");
-        $stmt->execute([$data['name'], $data['price'], $data['color'], $data['description'], $data['weight'], $data['size'], $data['quantity'], $data['category'], $id]);
+
+    $sets = [];
+    $values = [];
+    foreach ($data as $column => $value) {
+        $sets[] = "$column = ?";
+        $values[] = $value;
     }
+    if ($primaryKeyCount == 1) {
+        $values[] = $id;
+        $sql = "UPDATE $table SET " . implode(', ', $sets) . " WHERE $primaryKey = ?";
+    } else {
+        $idParts = explode(',', $id);
+        $values = array_merge($values, $idParts);
+        $sql = "UPDATE $table SET " . implode(', ', $sets) . " WHERE " . implode(' = ? AND ', $primaryKey) . " = ?";
+    }
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($values);
+
     echo json_encode(['message' => ucfirst($resource) . ' updated']);
 } elseif ($method == 'DELETE' && $id) {
-    // Xóa bản ghi theo ID
-    $stmt = $pdo->prepare("DELETE FROM $table WHERE $primaryKey = ?");
-    $stmt->execute([$id]);
+    // Delete a record
+    if ($primaryKeyCount == 1) {
+        $stmt = $pdo->prepare("DELETE FROM $table WHERE $primaryKey = ?");
+        $stmt->execute([$id]);
+    } else {
+        $idParts = explode(',', $id);
+        $sql = "DELETE FROM $table WHERE " . implode(' = ? AND ', $primaryKey) . " = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($idParts);
+    }
     echo json_encode(['message' => ucfirst($resource) . ' deleted']);
 } else {
     http_response_code(405);
