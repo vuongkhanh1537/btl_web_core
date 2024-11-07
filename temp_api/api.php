@@ -35,7 +35,26 @@ if (is_array($primaryKey)) {
 }
 
 // Handle HTTP methods
-if ($method == 'GET' && !$id) {
+if ($method == 'GET' && $id && $resource == 'order_') {
+    // Get a single order and the associated customer information
+    $stmt = $pdo->prepare("
+        SELECT 
+            o.*, 
+            c.name_, 
+            c.email
+        FROM order_ o
+        JOIN customer c ON o.customer_id = c.customer_id
+        WHERE o.order_id = ?
+    ");
+    $stmt->execute([$id]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($order) {
+        echo json_encode($order);
+    } else {
+        http_response_code(404);
+        echo json_encode(['error' => 'Order not found']);
+    }
+} elseif ($method == 'GET' && !$id) {
     // Get all records from the table
     $stmt = $pdo->query("SELECT * FROM $table");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
