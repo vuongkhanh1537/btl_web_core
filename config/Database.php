@@ -7,15 +7,16 @@ class Database {
     private $password ;
     public $conn;
 
-    public static function __construct() {
+    public function __construct() {
         $this->host = "localhost";
         $this->db_name= "assign_db";
         $this->username= "root";
         $this->password= "";
+        $this->conn = null;
+
     }
 
-    public static function getConnection() {
-        $this->conn = null;
+    public function getConnection() {
         try {
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->exec("set names utf8");

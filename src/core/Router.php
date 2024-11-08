@@ -19,7 +19,6 @@ class Router {
     public function handle() {
         $method = Request::getMethod();
         $path = Request::getPath();
-
         foreach ($this->routes as $route) {
             if ($route['method'] === $method && $this->matchPath($route['path'], $path, $params)) {
                 $controller = new $route['controller']($this->db);
@@ -34,7 +33,7 @@ class Router {
     private function matchPath($routePath, $requestPath, &$params) {
         $routeParts = explode('/', trim($routePath, '/'));
         $requestParts = explode('/', trim($requestPath, '/'));
-        
+
         if (count($routeParts) !== count($requestParts)) {
             return false;
         }
