@@ -8,9 +8,9 @@ class Routes {
     }
 
     private function defineRoutes() {
-        $this->router->addRoute("GET", "/btl_web_core/api/products", "ProductController", "index");
-        $this->router->addRoute("POST", "/btl_web_core/api/products",  "ProductController", "create");
-        // $this->router->addRoute("PUT", "/api/products/{id}",  "ProductController", "update");
-        // $this->router->addRoute("DELETE", "/api/products/{id}",  "ProductController", "delete");
+        // $this->router->addRoute("GET", "/btl_web_core/api/products", "ProductController", "index");
+        // $this->router->addRoute("POST", "/btl_web_core/api/products",  "ProductController", "create");
+        $this->router->addRoute("POST", "/btl_web_core/api/login",  "UserController", "login");
+        $this->router->addRoute("POST", "/btl_web_core/api/signup",  "UserController", "createCustomer");
     }
 }

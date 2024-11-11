@@ -1,14 +1,22 @@
 <?php
 
 class Database {
-    private $host = "localhost";
-    private $db_name = "btl_web";
-    private $username = "root";
-    private $password = "";
+    private $host ;
+    private $db_name ;
+    private $username ;
+    private $password ;
     public $conn;
 
-    public function getConnection() {
+    public function __construct() {
+        $this->host = "localhost";
+        $this->db_name= "assign_db";
+        $this->username= "root";
+        $this->password= "";
         $this->conn = null;
+
+    }
+
+    public function getConnection() {
         try {
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->exec("set names utf8");
