@@ -1,6 +1,7 @@
 <?php
 header("Content-Type: application/json");
 require './db_connection.php';
+require_once '../config/Authorization.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $request = explode('/', trim($_SERVER['PATH_INFO'], '/'));
@@ -33,6 +34,92 @@ if (is_array($primaryKey)) {
 } else {
     $primaryKeyCount = 1;
 }
+
+// Khởi tạo đối tượng Authorization
+$auth = new Authorization();
+
+// Quy định quyền hạn cho từng bảng và vai trò
+$permissions = [
+    'customer' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['read', 'update']
+    ],
+    'manager' => [
+        'admin' => ['create', 'read', 'update', 'delete']
+    ],
+    'product' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['read']
+    ],
+    'order_' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['create', 'read', 'update', 'delete']
+    ],
+    'promotion_code' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['read']
+    ],
+    'cart' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['create', 'read', 'update', 'delete']
+    ],
+    'contain' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['read']
+    ],
+    'rate' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['create', 'read', 'update', 'delete']
+    ],
+    'review' => [
+        'admin' => ['create', 'read', 'update', 'delete'],
+        'user' => ['read']
+    ]
+];
+
+// Cấu hình phân quyền
+function checkRolePermission($table, $method, $userRole, $permissions) {
+    // Kiểm tra xem bảng và vai trò có trong cấu hình không
+    if (isset($permissions[$table][$userRole]) && in_array($method, $permissions[$table][$userRole])) {
+        return true;
+    }
+    return false;
+}
+
+// Hàm kiểm tra JWT và vai trò người dùng
+function checkUserRole($table, $method, $permissions, $auth) {
+    // Lấy token từ Header Authorization
+    $headers = getallheaders();
+    if (!isset($headers['Authorization'])) {
+        http_response_code(401);
+        echo json_encode(["message" => "Authorization token missing"]);
+        exit;
+    }
+
+    $authHeader = $headers['Authorization'];
+    $token = str_replace('Bearer ', '', $authHeader);
+
+    // Giải mã token và lấy role từ payload
+    try {
+        $payload = $auth->decode($token);
+    } catch (Exception $e) {
+        http_response_code(401);
+        echo json_encode(["message" => $e->getMessage()]);
+        exit;
+    }
+
+    // Lấy vai trò từ payload
+    $userRole = $payload['role'] ?? null;
+    if (!$userRole || !checkRolePermission($table, strtolower($method), $userRole, $permissions)) {
+        http_response_code(403); // Forbidden
+        echo json_encode(["message" => "You do not have permission to access this resource"]);
+        exit;
+    }
+}
+
+// Kiểm tra quyền hạn trước khi xử lý API
+checkUserRole($table, strtolower($method), $permissions, $auth);
+
 
 // Handle HTTP methods
 if ($method == 'GET' && $id && $resource == 'order_') {
