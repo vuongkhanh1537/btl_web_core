@@ -8,6 +8,8 @@ class Router {
     }
 
     public function addRoute($method, $path, $controller, $action) {
+        // Remove btl_web_core from paths when registering routes
+        $path = str_replace('/btl_web_core', '', $path);
         $this->routes[] = [
             'method' => $method,
             'path' => $path,
@@ -19,7 +21,12 @@ class Router {
     public function handle() {
         $method = Request::getMethod();
         $path = Request::getPath();
+        
+        // Remove btl_web_core from request path
+        $path = str_replace('/btl_web_core', '', $path);
+        
         foreach ($this->routes as $route) {
+            $params = [];
             if ($route['method'] === $method && $this->matchPath($route['path'], $path, $params)) {
                 $controller = new $route['controller']($this->db);
                 call_user_func_array([$controller, $route['action']], $params);
@@ -27,10 +34,15 @@ class Router {
             }
         }
         
-        Response::json(404, ['error' => 'Route not found']);
+        Response::json(404, [
+            'error' => 'Route not found',
+            'requested_path' => $path,
+            'requested_method' => $method
+        ]);
     }
 
     private function matchPath($routePath, $requestPath, &$params) {
+        // Normalize paths by trimming slashes
         $routeParts = explode('/', trim($routePath, '/'));
         $requestParts = explode('/', trim($requestPath, '/'));
 
