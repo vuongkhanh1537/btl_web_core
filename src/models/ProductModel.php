@@ -121,4 +121,35 @@ class ProductModel {
         $stmt->bindParam(1, $id);
         return $stmt->execute();
     }
+
+    public function getByCategory($category) {
+        $query = "SELECT * FROM " . $this->tableName . " WHERE category = :category";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":category", $category);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getByName($name) {
+        $query = "SELECT * FROM " . $this->tableName . " WHERE name_ LIKE :name";
+        $stmt = $this->conn->prepare($query);
+        $searchName = "%" . $name . "%";
+        $stmt->bindParam(":name", $searchName);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getByCategories($categories) {
+        $placeholders = str_repeat('?,', count($categories) - 1) . '?';
+        $query = "SELECT * FROM " . $this->tableName . " WHERE category IN ($placeholders)";
+        $stmt = $this->conn->prepare($query);
+        
+        // Bind each category to its placeholder
+        foreach ($categories as $key => $category) {
+            $stmt->bindValue($key + 1, $category);
+        }
+        
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

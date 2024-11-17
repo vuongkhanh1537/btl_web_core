@@ -17,4 +17,9 @@ class Request {
         $body = file_get_contents('php://input');
         return json_decode($body, true);
     }
+
+    public static function getQueryParams() {
+        parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
+        return $query;
+    }
 }
