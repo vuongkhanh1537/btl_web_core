@@ -22,7 +22,10 @@ class Router {
         $method = Request::getMethod();
         $path = Request::getPath();
         
-        // Remove btl_web_core from request path
+        // Remove btl_web_core and anything before it from request path
+        $path = preg_replace('/^.*?btl_web_core/', '', $path);
+        
+        // Keep existing replacement for backwards compatibility
         $path = str_replace('/btl_web_core', '', $path);
         
         foreach ($this->routes as $route) {
