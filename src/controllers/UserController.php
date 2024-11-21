@@ -59,7 +59,7 @@ class UserController {
                                     ]);
             }
             else{
-                return Response::json(400, ['message' => 'Wrong password']);
+                return Response::json(401, ['message' => 'Wrong password']);
             }
             return Response::json(404, ['message' => 'Account not exist']);
                                      

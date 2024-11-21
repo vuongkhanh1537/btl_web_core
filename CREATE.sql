@@ -115,15 +115,6 @@ create table  assign_db.consisted(
 
 
 
-CREATE table  assign_db.rate(
-	user_id int  NOT NULL,
-    product_id int NOT NULL,
-    score int NOT NULL,
-    CONSTRAINT pk_rate PRIMARY KEY (user_id, product_id),
-    foreign key (user_id) references user(user_id) On update restrict on delete restrict,
-    foreign key (product_id) references product (product_id) On update restrict on delete restrict
-);
-
 
 CREATE table  assign_db.own (
 	user_id int  NOT NULL,
@@ -140,6 +131,7 @@ Create table assign_db.review(
     content varchar(255) not null,
     time_ datetime not null,
     reviewer_id  int not null,
+    score int NOT NULL,
     constraint pk_review Primary key (product_id, ordinal_number),
 	foreign key (product_id) references product (product_id) On update cascade on delete cascade,
     foreign key (reviewer_id) references user(user_id) On update restrict on delete restrict
