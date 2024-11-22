@@ -70,4 +70,35 @@ class ProductController {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
+
+
+    public function getCollection($CollectionId) {
+        try {
+            //$this->auth->checkPermission('product', 'delete');
+            $data=$this->productModel->getProductInCollection($CollectionId);
+            if ($data) {
+                Response::json(200, $data);
+            } else {
+                Response::json(404, ['error' => 'Collection not found']);
+            }
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
+
+    public function getReview($id) {
+        try {
+            $data=$this->productModel->getReview($id);
+            if ($data) {
+                Response::json(200, $data);
+            } else {
+                Response::json(404, ['error' => 'Collection not found']);
+            }
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
+
 }

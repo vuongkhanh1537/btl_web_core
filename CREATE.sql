@@ -12,6 +12,12 @@ CREATE table  assign_db.user(
     email varchar(255) NOT NULL unique
 );
 
+
+CREATE table  assign_db.collection_(
+    collection_id int  NOT NULL AUTO_INCREMENT primary key,
+    name_ varchar(255) NOT NULL
+);
+
 CREATE table  assign_db.product(
 	product_id int  NOT NULL AUTO_INCREMENT primary key,
     name_ varchar(255) NOT NULL,
@@ -22,24 +28,13 @@ CREATE table  assign_db.product(
     weight_ int NOT NULL,
     size_ int NOT NULL,
     quantity int NOT NULL,
-    category enum ('Shoes', 'Stocks','Sneaker')
+    category enum ('Shoes', 'Stocks','Sneaker'),
+    collection_id int  NOT NULL,
+    FOREIGN KEY (collection_id) references collection_(collection_id) On update restrict on delete restrict
 );
 
 
-CREATE table  assign_db.collection_(
-    collection_id int  NOT NULL AUTO_INCREMENT primary key,
-    name_ varchar(255) NOT NULL
-);
 
-
-CREATE table  assign_db.compriesof(
-    collection_id int  NOT NULL ,
-    product_id int  NOT NULL  ,
-    FOREIGN KEY (collection_id) references collection_(collection_id) On update restrict on delete restrict,
-    FOREIGN KEY (product_id) references product(product_id) On update restrict on delete restrict,
-    CONSTRAINT pk_create PRIMARY KEY (collection_id, product_id)
-
-);
 
 
 

@@ -54,6 +54,12 @@ class Authorization {
         $base64 = str_replace(['-', '_'], ['+', '/'], $data);
         return base64_decode($base64);
     }
+
+    public function getRole($token){
+        $payload=decode($token);
+        return payload['role'];
+    }
+
 }
 
     // payload: role, expiry (30 days), data  
