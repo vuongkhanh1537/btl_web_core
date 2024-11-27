@@ -22,6 +22,7 @@ class Routes {
         $this->router->addRoute("GET", "/api/users", "UserController", "index");
         $this->router->addRoute("GET", "/api/users/{id}", "UserController", "show");
         $this->router->addRoute("POST", "/api/signup", "UserController", "signup");
+        $this->router->addRoute("POST", "/api/login", "UserController", "login");
         $this->router->addRoute("PUT", "/api/users/{id}", "UserController", "update");
         $this->router->addRoute("DELETE", "/api/users/{id}", "UserController", "delete");
 
@@ -32,7 +33,7 @@ class Routes {
         $this->router->addRoute("PUT", "/api/orders/{id}", "OrderController", "update");
         $this->router->addRoute("DELETE", "/api/orders/{id}", "OrderController", "delete");
 
-        // Collection routes
+      // Collection routes
         $this->router->addRoute("GET", "/api/collections", "CollectionController", "index");
         $this->router->addRoute("GET", "/api/collections/{id}", "CollectionController", "show");
         $this->router->addRoute("POST", "/api/collections", "CollectionController", "create");
@@ -42,6 +43,7 @@ class Routes {
 
         // Auth routes
         $this->router->addRoute("POST", "/api/login", "AuthController", "login");
+
         
     }
 }

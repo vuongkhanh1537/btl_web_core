@@ -43,6 +43,7 @@ create table  assign_db.promotion_code(
     maximum_promo int NOT NULL,
     promo_value double NOT NULL,
     init_quantity int NOT NULL
+
 );
 
 

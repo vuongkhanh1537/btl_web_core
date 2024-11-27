@@ -31,7 +31,7 @@ class UserController {
             
             $token = $this->auth->encode([
                 "sub" => $user['user_id'],
-                "exp" => "exp",
+                "exp" => 'exp',
                 "role" => $user['role_']
             ]);
 

@@ -1,16 +1,15 @@
 <?php
-class ProductController {
-    private $productModel;
+class OrderController {
+    private $orderModel;
     private $auth;
 
     public function __construct($db) {
-        $this->productModel = new ProductModel($db);
+        $this->orderModel = new OrderModel($db);
         $this->auth = new Auth();
     }
 
     public function index() {
         try {
-            //$this->auth->checkPermission('product', 'read');
             $products = $this->productModel->getAll();
             Response::json(200, $products);
         } catch (Exception $e) {
@@ -20,12 +19,11 @@ class ProductController {
 
     public function show($id) {
         try {
-            //$this->auth->checkPermission('product', 'read');
             $product = $this->productModel->getById($id);
             if ($product) {
                 Response::json(200, $product);
             } else {
-                Response::json(404, ['error' => 'Product not found']);
+                Response::json(404, ['error' => 'Order not found']);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
@@ -71,28 +69,6 @@ class ProductController {
         }
     }
 
-    public function getByCategory($category) {
-        try {
-            $products = $this->productModel->getByCategory($category);
-            Response::json(200, $products);
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-    public function getByName($name) {
-        try {
-            $products = $this->productModel->getByName($name);
-            Response::json(200, $products);
-                  } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-          } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-
 
     public function getCollection($CollectionId) {
         try {
@@ -103,24 +79,7 @@ class ProductController {
             } else {
                 Response::json(404, ['error' => 'Collection not found']);
             }
-
         } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-    public function getByCategories() {
-        try {
-            $categories = Request::getQueryParams()['categories'] ?? '';
-            $categoryArray = explode(',', $categories);
-            
-            if (empty($categoryArray)) {
-                throw new Exception('No categories provided');
-            }
-
-            $products = $this->productModel->getByCategories($categoryArray);
-            Response::json(200, $products);
-                  } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
@@ -134,9 +93,10 @@ class ProductController {
             } else {
                 Response::json(404, ['error' => 'Collection not found']);
             }
-
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
+
+
 }
