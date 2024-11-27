@@ -9,23 +9,34 @@ class OrderController {
     }
 
     public function index() {
-        
-
+        try {
+            $products = $this->productModel->getAll();
+            Response::json(200, $products);
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
     }
 
     public function show($id) {
-        
+        try {
+            $product = $this->productModel->getById($id);
+            if ($product) {
+                Response::json(200, $product);
+            } else {
+                Response::json(404, ['error' => 'Order not found']);
+            }
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
     }
 
     public function create() {
         try {
+            //$this->auth->checkPermission('product', 'create');
             $data = Request::getBody();
-            $data['order_id'] = $this->orderModel->createOrder($data);
-            $this->orderModel->addProductToOrder($data)
+            
             if ($this->productModel->validateAndCreate($data)) {
-                Response::json(201, ['message' => 'Product created successfully',
-                                        'order_id'=> $data['id']
-                                    ]);
+                Response::json(201, ['message' => 'Product created successfully']);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);

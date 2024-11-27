@@ -25,6 +25,7 @@ CREATE table  assign_db.product(
     color varchar(255) NOT NULL,
     brand varchar(255) NOT NULL,
     description_ text NOT NULL,
+    image_path text NOT NULL,
     weight_ int NOT NULL,
     size_ int NOT NULL,
     quantity int NOT NULL,
@@ -32,9 +33,6 @@ CREATE table  assign_db.product(
     collection_id int  NOT NULL,
     FOREIGN KEY (collection_id) references collection_(collection_id) On update restrict on delete restrict
 );
-
-
-
 
 
 
@@ -49,6 +47,8 @@ create table  assign_db.order_(
     status_ ENUM('Completed', 'Shipping', 'Cancelled') not null,
     address_ varchar(255) not null,
     user_id int not null,
+    promotion_code_id int not NULL,
+    foreign key (promotion_code_id) references promotion_code(code_id) On update restrict on delete restrict
     FOREIGN KEY (user_id) references user(user_id) On update restrict on delete restrict
 );
 
@@ -65,30 +65,10 @@ create table  assign_db.promotion_code(
 
 create table  assign_db.cart(
 	cart_id int NOT NULL primary key
-   
-);
-
-create table assign_db.create_(
-	cart_id int not NULL,
     user_id int not NULL,
     foreign key (user_id) references user(user_id) On update restrict on delete restrict,
-    foreign key (cart_id) references cart(cart_id) On update cascade on delete cascade,
-    CONSTRAINT pk_create PRIMARY KEY (cart_id, user_id)
 );
 
-create table  assign_db.make(
-	order_id int not NULL primary key,
-    user_id int not NULL,
-    foreign key (user_id) references user(user_id) On update restrict on delete restrict,
-    foreign key (order_id) references order_(order_id) On update cascade on delete cascade
-);
-
-create table  assign_db.apply_for(
-	order_id int not NULL primary key,
-    promotion_code_id int not NULL,
-    foreign key (order_id) references order_(order_id) On update cascade on delete cascade,
-    foreign key (promotion_code_id) references promotion_code(code_id) On update restrict on delete restrict
-);
 
 create table  assign_db.contain(
 	order_id int not NULL,
