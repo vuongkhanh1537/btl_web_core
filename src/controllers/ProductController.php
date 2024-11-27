@@ -71,6 +71,28 @@ class ProductController {
         }
     }
 
+    public function getByCategory($category) {
+        try {
+            $products = $this->productModel->getByCategory($category);
+            Response::json(200, $products);
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function getByName($name) {
+        try {
+            $products = $this->productModel->getByName($name);
+            Response::json(200, $products);
+                  } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+          } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
+
 
     public function getCollection($CollectionId) {
         try {
@@ -81,10 +103,12 @@ class ProductController {
             } else {
                 Response::json(404, ['error' => 'Collection not found']);
             }
+
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
+
 
     public function getAllCollection(){
         try{
@@ -96,6 +120,23 @@ class ProductController {
         
     }
 
+    public function getByCategories() {
+        try {
+            $categories = Request::getQueryParams()['categories'] ?? '';
+            $categoryArray = explode(',', $categories);
+            
+            if (empty($categoryArray)) {
+                throw new Exception('No categories provided');
+            }
+
+            $products = $this->productModel->getByCategories($categoryArray);
+            Response::json(200, $products);
+                  } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
+
     public function getReview($id) {
         try {
             $data=$this->productModel->getReview($id);
@@ -104,10 +145,9 @@ class ProductController {
             } else {
                 Response::json(404, ['error' => 'Collection not found']);
             }
+
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
-
-
 }

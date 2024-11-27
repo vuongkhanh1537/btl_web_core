@@ -14,8 +14,9 @@ class Routes {
         $this->router->addRoute("POST", "/api/products", "ProductController", "create");
         $this->router->addRoute("PUT", "/api/products/{id}", "ProductController", "update");
         $this->router->addRoute("DELETE", "/api/products/{id}", "ProductController", "delete");
-        $this->router->addRoute("GET", "/api/collection/{id}", "ProductController", "getCollection");
-        $this->router->addRoute("GET", "/api/products/review/{id}", "ProductController", "getReview");
+        $this->router->addRoute("GET", "/api/products/name/{name}", "ProductController", "getByName");
+        $this->router->addRoute("GET", "/api/products/category/{category}", "ProductController", "getByCategory");
+        $this->router->addRoute("GET", "/api/products/categories", "ProductController", "getByCategories");
 
         // User routes
         $this->router->addRoute("GET", "/api/users", "UserController", "index");
@@ -31,6 +32,17 @@ class Routes {
         $this->router->addRoute("POST", "/api/orders", "OrderController", "create"); 
         $this->router->addRoute("PUT", "/api/orders/{id}", "OrderController", "update");
         $this->router->addRoute("DELETE", "/api/orders/{id}", "OrderController", "delete");
+
+      // Collection routes
+        $this->router->addRoute("GET", "/api/collections", "CollectionController", "index");
+        $this->router->addRoute("GET", "/api/collections/{id}", "CollectionController", "show");
+        $this->router->addRoute("POST", "/api/collections", "CollectionController", "create");
+        $this->router->addRoute("PUT", "/api/collections/{id}", "CollectionController", "update");
+        $this->router->addRoute("DELETE", "/api/collections/{id}", "CollectionController", "delete");
+
+
+        // Auth routes
+        $this->router->addRoute("POST", "/api/login", "AuthController", "login");
 
         
     }

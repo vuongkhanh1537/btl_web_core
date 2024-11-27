@@ -9,15 +9,17 @@ class OrderController {
     }
 
     public function index() {
-        
+        try {
+            //$this->auth->checkPermission('order', 'read');
+            $orders = $this->orderModel->getAll();
+            Response::json(200, $orders);
 
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
     }
 
     public function show($id) {
-        
-    }
-
-    public function create() {
         try {
             $data = Request::getBody();
             if()
@@ -27,6 +29,20 @@ class OrderController {
                 Response::json(201, ['message' => 'Order created successfully',
                                         'order_id'=> $data['id']
                                     ]);
+
+            }
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
+    public function create() {
+        try {
+            //$this->auth->checkPermission('order', 'create');
+            $data = Request::getBody();
+            
+            if ($this->orderModel->validateAndCreate($data)) {
+                Response::json(201, ['message' => 'Order created successfully']);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
@@ -35,25 +51,12 @@ class OrderController {
 
     public function update($id) {
         try {
-            //$this->auth->checkPermission('product', 'update');
+            //$this->auth->checkPermission('order', 'update');
             $data = Request::getBody();
             
-            if ($this->productModel->validateAndUpdate($id, $data)) {
-                Response::json(200, ['message' => 'Product updated successfully']);
-            }
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-    public function delete($id) {
-        try {
-            //$this->auth->checkPermission('product', 'delete');
-            if ($this->productModel->delete($id)) {
-                Response::json(200, ['message' => 'Product deleted successfully']);
-            } else {
-                Response::json(500, ['error' => 'Failed to delete product']);
-            }
+            if ($this->orderModel->validateAndUpdate($id, $data)) {
+                Response::json(200, ['message' => 'Order updated successfully']);
+              }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
@@ -68,12 +71,26 @@ class OrderController {
                 Response::json(200, $data);
             } else {
                 Response::json(404, ['error' => 'Collection not found']);
+
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
 
+
+    public function delete($id) {
+        try {
+            //$this->auth->checkPermission('order', 'delete');
+            if ($this->orderModel->delete($id)) {
+                Response::json(200, ['message' => 'Order deleted successfully']);
+            } else {
+                Response::json(500, ['error' => 'Failed to delete order']);
+            } 
+        }catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+}
 
     public function getReview($id) {
         try {
@@ -82,11 +99,11 @@ class OrderController {
                 Response::json(200, $data);
             } else {
                 Response::json(404, ['error' => 'Collection not found']);
+
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
-
-
 }
+

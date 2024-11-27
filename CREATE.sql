@@ -34,6 +34,17 @@ CREATE table  assign_db.product(
     FOREIGN KEY (collection_id) references collection_(collection_id) On update restrict on delete restrict
 );
 
+create table  assign_db.promotion_code(
+	code_id int NOT NULL primary key,
+    name_ varchar(255) NOT NULL,
+    start_date datetime NOT NULL, 
+    end_date datetime NOT NULL,
+    min_order int NOT NULL,
+    maximum_promo int NOT NULL,
+    promo_value double NOT NULL,
+    init_quantity int NOT NULL
+
+);
 
 
 create table  assign_db.order_(
@@ -48,25 +59,15 @@ create table  assign_db.order_(
     address_ varchar(255) not null,
     user_id int not null,
     promotion_code_id int not NULL,
-    foreign key (promotion_code_id) references promotion_code(code_id) On update restrict on delete restrict
+    foreign key (promotion_code_id) references promotion_code(code_id) On update restrict on delete restrict,
     FOREIGN KEY (user_id) references user(user_id) On update restrict on delete restrict
 );
 
-create table  assign_db.promotion_code(
-	code_id int NOT NULL primary key,
-    name_ varchar(255) NOT NULL,
-    start_date datetime NOT NULL, 
-    end_date datetime NOT NULL,
-    min_order int NOT NULL,
-    maximum_promo int NOT NULL,
-    promo_value double NOT NULL,
-    init_quantity int NOT NULL
-);
 
 create table  assign_db.cart(
-	cart_id int NOT NULL primary key
+	cart_id int NOT NULL primary key,
     user_id int not NULL,
-    foreign key (user_id) references user(user_id) On update restrict on delete restrict,
+    foreign key (user_id) references user(user_id) On update restrict on delete restrict
 );
 
 
