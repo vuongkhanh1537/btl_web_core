@@ -121,4 +121,27 @@ class ProductModel {
         $stmt->bindParam(1, $id);
         return $stmt->execute();
     }
+
+    public function getProductInCollection($CollectionId){
+        $query = "SELECT p.* FROM ". $this->tableName . " p 
+        inner join collection_ c on c.collection_id = p.collection_id
+        where c.collection_id = :collection_id" ;
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':collection_id', $CollectionId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function getReview($id){
+        if (!$this->getById($id)) {
+            throw new Exception('Product not found');
+        }
+        $query = "SELECT r.*, u.name_  FROM review r
+            inner join user u on u.user_id = r.reviewer_id
+            where r.product_id = :product_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':product_id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
