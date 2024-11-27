@@ -21,12 +21,15 @@ class OrderController {
 
     public function show($id) {
         try {
-            //$this->auth->checkPermission('order', 'read');
-            $order = $this->orderModel->getById($id);
-            if ($order) {
-                Response::json(200, $order);
-            } else {
-                Response::json(404, ['error' => 'Order not found']);
+            $data = Request::getBody();
+            if()
+            $data['order_id'] = $this->orderModel->createOrder($data);
+            $this->orderModel->addProductToOrder($data)
+            if ($this->productModel->validateAndCreate($data)) {
+                Response::json(201, ['message' => 'Order created successfully',
+                                        'order_id'=> $data['id']
+                                    ]);
+
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
