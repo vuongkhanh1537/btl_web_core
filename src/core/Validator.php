@@ -29,6 +29,10 @@ class Validator {
                     echo $data[$field];
                     return false;
                 }
+                if ($rule === 'positive' && (!is_numeric($data[$field]) ||intval($data['field'])>0)) {
+                    echo $data[$field];
+                    return false;
+                }
 
                 if ($rule === 'gender' && !($data[$field] =="F" || $data[$field] =="M" || $data[$field] =="N" ))  {
                     echo $data[$field];

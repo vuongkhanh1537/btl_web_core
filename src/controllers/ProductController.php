@@ -86,6 +86,15 @@ class ProductController {
         }
     }
 
+    public function getAllCollection(){
+        try{
+            $data=$this->productModel->getCollection($CollectionId);
+            Response::json(200, $data);
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+        
+    }
 
     public function getReview($id) {
         try {

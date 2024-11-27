@@ -20,10 +20,11 @@ class OrderController {
     public function create() {
         try {
             $data = Request::getBody();
+            if()
             $data['order_id'] = $this->orderModel->createOrder($data);
             $this->orderModel->addProductToOrder($data)
             if ($this->productModel->validateAndCreate($data)) {
-                Response::json(201, ['message' => 'Product created successfully',
+                Response::json(201, ['message' => 'Order created successfully',
                                         'order_id'=> $data['id']
                                     ]);
             }
