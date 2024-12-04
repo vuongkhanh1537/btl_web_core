@@ -29,6 +29,7 @@ class Routes {
         // Order routes  
         $this->router->addRoute("GET", "/api/orders", "OrderController", "index");
         $this->router->addRoute("GET", "/api/orders/{id}", "OrderController", "show");
+        $this->router->addRoute("GET", "/api/orders/{id}/details", "OrderController", "showDetails");
         $this->router->addRoute("POST", "/api/orders", "OrderController", "create"); 
         $this->router->addRoute("PUT", "/api/orders/{id}", "OrderController", "update");
         $this->router->addRoute("DELETE", "/api/orders/{id}", "OrderController", "delete");

@@ -22,6 +22,81 @@ class OrderModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getDetails($id) {
+        try {
+            // First verify order exists
+            $order = $this->getById($id);
+            if (!$order) {
+                throw new Exception("Order with ID $id not found");
+            }
+        
+            // Get order details including contained products and user details
+            $query = "SELECT o.*, 
+                    c.product_id, c.quantity, c.price,
+                    p.name_ as product_name, p.color, p.brand,
+                    u.user_id, u.name_ as user_name, u.email, u.role_, 
+                    u.gender, u.birthday
+                FROM " . $this->tableName . " o
+                INNER JOIN contain c ON o.order_id = c.order_id 
+                INNER JOIN product p ON c.product_id = p.product_id
+                INNER JOIN user u ON o.user_id = u.user_id
+                WHERE o.order_id = ?";
+        
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $id);
+            $stmt->execute();
+            
+            $details = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            if (empty($details)) {
+                throw new Exception("No order details found for order ID $id");
+            }
+    
+            // Format response
+            $orderInfo = [
+                'order_id' => $details[0]['order_id'],
+                'order_time' => $details[0]['order_time'],
+                'shipment_time' => $details[0]['shipment_time'],
+                'ship_fee' => $details[0]['ship_fee'],
+                'payment_status' => $details[0]['payment_status'], 
+                'total_payment' => $details[0]['total_payment'],
+                'payment_method' => $details[0]['payment_method'],
+                'payment_time' => $details[0]['payment_time'],
+                'status_' => $details[0]['status_'],
+                'address_' => $details[0]['address_'],
+                'user' => [
+                    'id' => $details[0]['user_id'],
+                    'name' => $details[0]['user_name'],
+                    'email' => $details[0]['email'],
+                    'role' => $details[0]['role_'],
+                    'gender' => $details[0]['gender'], 
+                    'birthday' => $details[0]['birthday']
+                ],
+                'promotion_code_id' => $details[0]['promotion_code_id'],
+                'discount' => $details[0]['discount'],
+                'products' => []
+            ];
+    
+            foreach ($details as $detail) {
+                $orderInfo['products'][] = [
+                    'product_id' => $detail['product_id'],
+                    'product_name' => $detail['product_name'],
+                    'quantity' => $detail['quantity'],
+                    'price' => $detail['price'],
+                    'color' => $detail['color'],
+                    'brand' => $detail['brand']
+                ];
+            }
+    
+            return $orderInfo;
+    
+        } catch (PDOException $e) {
+            throw new Exception("Database error: " . $e->getMessage());
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
     public function validateAndCreate($data) {
         if (!$this->validateData($data, true)) {
             throw new Exception('Invalid data');
