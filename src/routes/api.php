@@ -41,6 +41,14 @@ class Routes {
         $this->router->addRoute("DELETE", "/api/collections/{id}", "CollectionController", "delete");
 
 
+        // Cart routes
+        $this->router->addRoute("GET", "/api/cart", "CartController", "show");
+        $this->router->addRoute("POST", "/api/cart", "CartController", "addProduct");
+        $this->router->addRoute("PUT", "/api/cart/{id}", "CartController", "updateProduct");
+        $this->router->addRoute("DELETE", "/api/cart/{id}", "CartController", "removeProduct");
+       
+
+
         // Auth routes
         $this->router->addRoute("POST", "/api/login", "AuthController", "login");
 

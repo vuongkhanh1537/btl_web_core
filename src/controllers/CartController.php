@@ -67,7 +67,40 @@ class CartController {
         }
     }
 
-    public function updateProduct(){
+
+    public function updateProduct() {
+        try {
+            try{
+                $role =$this->auth->getRole();
+                $id = $this->auth->getId();
+                if ($role != "customer"){
+                    Respone::json(403, ['error' => 'Invalid role'])
+                }
+            }
+            catch (Exception $e){
+                Response::json(401, ['error' => $e->getMessage()]);
+            }
+            $cart_id= $this->cartModel->getCartIDByUserId($id);  
+            if(empty($cart)){
+                $cart_id=$this->cartModel->createCartForUser($id);
+            }
+            $data = Request::getBody();
+            $product_id = data['product_id'];
+            $quantity= data['quantity'];
+            $data_product = $this->productModel->getById($product_id);
+            if ($quantity > $data_product['quantity']){
+                Response::json(409, ['message' => 'Not enough product']);
+            }
+            $this->cartModel->updateProductInCart($cart_id,$product_id,$quantity);
+            Response::json(201, ['message' => 'Product added successfully']);
+
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
+
+    public function removeProduct($cart_id){
         try{            
             try{
                 $role =$this->auth->getRole();
@@ -92,28 +125,5 @@ class CartController {
 
         
     }
-
-    public function removeProduct(){
-        try{
-            try{
-                $role =$this->auth->getRole();
-                $id = $this->auth->getId();
-                if ($role != "customer"){
-                    Respone::json(403, ['error' => 'Invalid role'])
-                }
-            }
-            catch (Exception $e){
-                Response::json(401, ['error' => $e->getMessage()]);
-            }
-            $id = Resquest::getPath()
-            $this->cartModel
-
-
-        }
-        catch (Exception $e){
-            Response::json(401, ['error' => $e->getMessage()]);
-        }
-    }
-  
 
 }

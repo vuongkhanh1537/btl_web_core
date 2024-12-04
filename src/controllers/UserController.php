@@ -14,6 +14,11 @@ class UserController {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
             
             $user = $this->userModel->validateAndCreate($data);
+            $token = $this->auth->encode([
+                "sub" => $user['user_id'],
+                "exp" => 'exp',
+                "role" => $user['role_']
+            ]);
             Response::json(201, ['message' => 'Customer created successfully',
             'data' =>[ 
                 'user' =>[            
@@ -38,11 +43,7 @@ class UserController {
             
             $user = $this->userModel->validateLogin($data);
             
-            $token = $this->auth->encode([
-                "sub" => $user['user_id'],
-                "exp" => 'exp',
-                "role" => $user['role_']
-            ]);
+            
 
             Response::json(200, [
                 'message' => 'Login successful',

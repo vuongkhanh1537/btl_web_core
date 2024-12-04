@@ -35,14 +35,14 @@ class UserModel {
         $this->validateData($data, true);
 
 
-        $existing = $this->getByUsername($data['username']);
+        $existing = $this->getByEmail($data['email']);
         if (count($existing) >= 1) {
-            throw new Exception('Username already exists');
+            throw new Exception('email already exists');
         }
 
         $query = "INSERT INTO " . $this->tableName . " 
-            (name_, password_, role_, username, gender, birthday, email) 
-            VALUES (:name, :password, :role, :username, :gender, :birthday, :email)";
+            (name_, password_, role_,  gender, birthday, email) 
+            VALUES (:name, :password, :role,  :gender, :birthday, :email)";
 
         $stmt = $this->conn->prepare($query);
         $this->bindUserParams($stmt, $data);
