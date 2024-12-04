@@ -47,7 +47,7 @@ class UserModel {
         $stmt = $this->conn->prepare($query);
         $this->bindUserParams($stmt, $data);
         $stmt->execute();
-        $user_id = $pdo->lastInsertId();
+        $user_id = $this->conn->lastInsertId();
         return $this->getById($user_id);
     }
 
@@ -92,12 +92,12 @@ class UserModel {
 
     public function validateLogin($data) {
         if (!isset($data['email']) || !isset($data['password'])) {
-            throw new Exception('Username and password are required');
+            throw new Exception('Email and password are required');
         }
         
         $users = $this->getByEmail($data['email']);
         if (count($users) === 0) {
-            throw new Exception('User not found');
+            throw new Exception('Email not found');
         }
         $user = $users[0];
         if (!password_verify($data['password'], $user['password_'])) {
