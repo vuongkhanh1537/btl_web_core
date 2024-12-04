@@ -2,7 +2,6 @@
 
 require_once 'config/Database.php';
 require_once 'config/Authorization.php';
-require_once 'src/core/Auth.php';
 require_once 'src/core/Request.php';
 require_once 'src/core/Response.php';
 require_once 'src/core/Router.php';

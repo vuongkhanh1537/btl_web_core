@@ -20,7 +20,6 @@ class CollectionController {
 
     public function show($id) {
         try {
-            //$this->auth->checkPermission('collection', 'read');
             $collection = $this->collectionModel->getById($id);
             if ($collection) {
                 Response::json(200, $collection);

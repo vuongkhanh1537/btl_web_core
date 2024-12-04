@@ -28,7 +28,7 @@ class ProductModel {
         $stmt->bindParam(':init_quantity', $data['init_quantity'], PDO::PARAM_INT);
         $stmt->execute();
         $code_id = $pdo->lastInsertId();
-        return $code_id
+        return $code_id;
     }
     
     public function getById($id) {

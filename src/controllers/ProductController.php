@@ -5,14 +5,16 @@ class ProductController {
 
     public function __construct($db) {
         $this->productModel = new ProductModel($db);
-        $this->auth = new Auth();
+        $this->auth = new Authorization();
     }
 
     public function index() {
         try {
             //$this->auth->checkPermission('product', 'read');
             $products = $this->productModel->getAll();
-            Response::json(200, $products);
+            Response::json(200, [
+                'data' => $products
+            ]);
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
@@ -23,7 +25,12 @@ class ProductController {
             //$this->auth->checkPermission('product', 'read');
             $product = $this->productModel->getById($id);
             if ($product) {
-                Response::json(200, $product);
+                $collection_id=$product['collection_id'];
+                $similar_product = this->getSimilarProduct($id,$collection_id);
+                Response::json(200, [
+                    "data" =>$product,
+                    "variant" => $similar_product
+                ] );
             } else {
                 Response::json(404, ['error' => 'Product not found']);
             }
@@ -34,7 +41,6 @@ class ProductController {
 
     public function create() {
         try {
-            //$this->auth->checkPermission('product', 'create');
             $data = Request::getBody();
             
             if ($this->productModel->validateAndCreate($data)) {
@@ -49,7 +55,6 @@ class ProductController {
         try {
             //$this->auth->checkPermission('product', 'update');
             $data = Request::getBody();
-            
             if ($this->productModel->validateAndUpdate($id, $data)) {
                 Response::json(200, ['message' => 'Product updated successfully']);
             }
@@ -87,38 +92,8 @@ class ProductController {
                   } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
-          } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
     }
 
-
-
-    public function getCollection($CollectionId) {
-        try {
-            //$this->auth->checkPermission('product', 'delete');
-            $data=$this->productModel->getProductInCollection($CollectionId);
-            if ($data) {
-                Response::json(200, $data);
-            } else {
-                Response::json(404, ['error' => 'Collection not found']);
-            }
-
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-
-    public function getAllCollection(){
-        try{
-            $data=$this->productModel->getCollection($CollectionId);
-            Response::json(200, $data);
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-        
-    }
 
     public function getByCategories() {
         try {
