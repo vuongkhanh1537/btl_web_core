@@ -28,7 +28,7 @@ CREATE table  product(
     weight_ int NOT NULL,
     size_ int NOT NULL,
     quantity int NOT NULL,
-    category enum ('Shoes', 'Stocks','Sneaker'),
+    category enum ('Men','Women','Unisex'),
     collection_id int  NOT NULL,
     FOREIGN KEY (collection_id) references collection_(collection_id) On update restrict on delete restrict
 );

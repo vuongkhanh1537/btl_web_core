@@ -12,11 +12,12 @@ require_once 'src/models/ProductModel.php';
 require_once 'src/models/UserModel.php';
 require_once 'src/models/OrderModel.php';
 require_once 'src/models/CollectionModel.php';
+require_once 'src/models/DashboardModel.php';
 require_once 'src/controllers/CollectionController.php';
 require_once 'src/controllers/ProductController.php';
 require_once 'src/controllers/UserController.php';
 require_once 'src/controllers/OrderController.php';
-
+require_once 'src/controllers/DashboardController.php';
 
 $app = new App();
 $app->run();

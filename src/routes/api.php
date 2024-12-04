@@ -48,11 +48,13 @@ class Routes {
         $this->router->addRoute("PUT", "/api/cart/{id}", "CartController", "updateProduct");
         $this->router->addRoute("DELETE", "/api/cart/{id}", "CartController", "removeProduct");
        
-
-
         // Auth routes
         $this->router->addRoute("POST", "/api/login", "AuthController", "login");
 
-        
+        // Dashboard routes
+        $this->router->addRoute("GET", "/api/revenue", "DashboardController", "getTotalRevenue");
+        $this->router->addRoute("GET", "/api/products/top-selling", "DashboardController", "getTopSellingProducts");
+        $this->router->addRoute("GET", "/api/sales/category", "DashboardController", "getSalesByCategory");
+        $this->router->addRoute("GET", "/api/orders/count", "DashboardController", "getTotalOrderCount");
     }
 }
