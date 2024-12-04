@@ -29,6 +29,7 @@ class Routes {
         // Order routes  
         $this->router->addRoute("GET", "/api/orders", "OrderController", "index");
         $this->router->addRoute("GET", "/api/orders/{id}", "OrderController", "show");
+        $this->router->addRoute("GET", "/api/orders/{id}/details", "OrderController", "showDetails");
         $this->router->addRoute("POST", "/api/orders", "OrderController", "create"); 
         $this->router->addRoute("PUT", "/api/orders/{id}", "OrderController", "update");
         $this->router->addRoute("DELETE", "/api/orders/{id}", "OrderController", "delete");
@@ -47,11 +48,13 @@ class Routes {
         $this->router->addRoute("PUT", "/api/cart/{id}", "CartController", "updateProduct");
         $this->router->addRoute("DELETE", "/api/cart/{id}", "CartController", "removeProduct");
        
-
-
         // Auth routes
         $this->router->addRoute("POST", "/api/login", "AuthController", "login");
 
-        
+        // Dashboard routes
+        $this->router->addRoute("GET", "/api/revenue", "DashboardController", "getTotalRevenue");
+        $this->router->addRoute("GET", "/api/products/top-selling", "DashboardController", "getTopSellingProducts");
+        $this->router->addRoute("GET", "/api/sales/category", "DashboardController", "getSalesByCategory");
+        $this->router->addRoute("GET", "/api/orders/count", "DashboardController", "getTotalOrderCount");
     }
 }

@@ -16,6 +16,11 @@ class Database {
         $this->port="34575";
         $this->conn = null;
 
+        // $this->host = "localhost";
+        // $this->db_name= "assign_db";
+        // $this->username = "root";
+        // $this->password = "";
+
     }
 
     public function getConnection() {

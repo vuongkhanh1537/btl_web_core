@@ -32,6 +32,20 @@ class OrderController {
         }
     }
 
+    public function showDetails($id) {
+        try {
+            //$this->auth->checkPermission('order', 'read');
+            $details = $this->orderModel->getDetails($id);
+            if ($details) {
+                Response::json(200, $details);
+            } else {
+                Response::json(404, ['error' => 'Order details not found']);
+            }
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
     public function create() {
         try {
             //$this->auth->checkPermission('order', 'create');
