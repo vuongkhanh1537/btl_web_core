@@ -22,10 +22,10 @@ class UserController {
             Response::json(201, ['message' => 'Customer created successfully',
             'data' =>[ 
                 'user' =>[            
-                    'id' =>$user['id'],
+                    'id' =>$user['user_id'],
                     'email' => $user['email'],
                     'name' => $user['name_'],
-                    'role' => $user['role']
+                    'role' => $user['role_']
                 ],
                 'token' => $token
             ]
