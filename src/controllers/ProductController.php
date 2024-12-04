@@ -26,7 +26,7 @@ class ProductController {
             $product = $this->productModel->getById($id);
             if ($product) {
                 $collection_id=$product['collection_id'];
-                $similar_product = this->getSimilarProduct($id,$collection_id);
+                $similar_product = $this->productModel->getSimilarProduct($id,$collection_id);
                 Response::json(200, [
                     "data" =>$product,
                     "variant" => $similar_product
