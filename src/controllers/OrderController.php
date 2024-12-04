@@ -5,14 +5,14 @@ class OrderController {
 
     public function __construct($db) {
         $this->orderModel = new OrderModel($db);
-        $this->auth = new Auth();
+        $this->auth = new Authorization();
     }
 
     public function index() {
         try {
+            //$this->auth->checkPermission('order', 'read');
             $orders = $this->orderModel->getAll();
             Response::json(200, $orders);
-
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
@@ -20,16 +20,28 @@ class OrderController {
 
     public function show($id) {
         try {
-            $data = Request::getBody();
-            $data['order_id'] = $this->orderModel->createOrder($data);
-            $this->orderModel->addProductToOrder($data);                              
-            if ($this->productModel->validateAndCreate($data)) {
-                Response::json(201, ['message' => 'Order created successfully',
-                                        'order_id'=> $data['id']
-                                    ]);
+            //$this->auth->checkPermission('order', 'read');
+            $order = $this->orderModel->getById($id);
+            if ($order) {
+                Response::json(200, $order);
+            } else {
+                Response::json(404, ['error' => 'Order not found']);
+            }
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
 
-            } 
-        }catch (Exception $e) {
+    public function showDetails($id) {
+        try {
+            //$this->auth->checkPermission('order', 'read');
+            $details = $this->orderModel->getDetails($id);
+            if ($details) {
+                Response::json(200, $details);
+            } else {
+                Response::json(404, ['error' => 'Order details not found']);
+            }
+        } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
@@ -54,28 +66,11 @@ class OrderController {
             
             if ($this->orderModel->validateAndUpdate($id, $data)) {
                 Response::json(200, ['message' => 'Order updated successfully']);
-              }
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-
-    public function getCollection($CollectionId) {
-        try {
-            //$this->auth->checkPermission('product', 'delete');
-            $data=$this->productModel->getProductInCollection($CollectionId);
-            if ($data) {
-                Response::json(200, $data);
-            } else {
-                Response::json(404, ['error' => 'Collection not found']);
-
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
-
 
     public function delete($id) {
         try {
@@ -84,24 +79,9 @@ class OrderController {
                 Response::json(200, ['message' => 'Order deleted successfully']);
             } else {
                 Response::json(500, ['error' => 'Failed to delete order']);
-            } 
-        }catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-}
-
-    public function getReview($id) {
-        try {
-            $data=$this->productModel->getReview($id);
-            if ($data) {
-                Response::json(200, $data);
-            } else {
-                Response::json(404, ['error' => 'Collection not found']);
-
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
 }
-
