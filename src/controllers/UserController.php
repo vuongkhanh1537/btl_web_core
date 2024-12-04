@@ -43,7 +43,11 @@ class UserController {
             
             $user = $this->userModel->validateLogin($data);
             
-            
+            $token = $this->auth->encode([
+                "sub" => $user['user_id'],
+                "exp" => 'exp',
+                "role" => $user['role_']
+            ]);
 
             Response::json(200, [
                 'message' => 'Login successful',

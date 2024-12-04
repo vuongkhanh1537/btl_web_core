@@ -40,9 +40,9 @@ class App {
         header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
         
         // Handle preflight requests
-        // if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        //     header("HTTP/1.1 200 OK");
-        //     exit();
-        // }
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            header("HTTP/1.1 200 OK");
+            exit();
+        }
     }
 }
