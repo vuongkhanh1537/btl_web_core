@@ -76,9 +76,9 @@ class Authorization {
 
         $token = str_replace('Bearer ', '', $headers['Authorization']);
         $payload = $this->decode($token);
-        $role = $payload['role'] ?? null;
+        $id = $payload['sub'] ?? null;
 
-        return $role;
+        return $id;
     }
 }
 ?>

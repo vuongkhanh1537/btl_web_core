@@ -7,7 +7,7 @@ class CartController {
     public function __construct($db) {
         $this->cartModel = new CartModel($db);
         $this->productModel = new ProductModel($db);
-        $this->auth = new Auth();
+        $this->auth = new Authorization ();
     }
 
 
@@ -16,7 +16,7 @@ class CartController {
             $role =$this->auth->getRole();
             $id = $this->auth->getId();
             if ($role != "customer"){
-                Respone::json(403, ['error' => 'Invalid role'])
+                Respone::json(403, ['error' => 'Invalid role']);
             }
         }
         catch (Exception $e){
@@ -42,19 +42,25 @@ class CartController {
                 $role =$this->auth->getRole();
                 $id = $this->auth->getId();
                 if ($role != "customer"){
-                    Respone::json(403, ['error' => 'Invalid role'])
+                    Respone::json(403, ['error' => 'Invalid role']);
                 }
             }
             catch (Exception $e){
                 Response::json(401, ['error' => $e->getMessage()]);
             }
-            $cart_id= $this->cartModel->getCartIDByUserId($id);  
-            if(empty($cart)){
+            $cart_id= $this->cartModel->getCartIDByUserId($id); 
+            if(empty($cart_id)){
                 $cart_id=$this->cartModel->createCartForUser($id);
             }
+            else{
+                $cart_id = $cart_id[0]['cart_id'];
+            }
+  
+
+            
             $data = Request::getBody();
-            $product_id = data['product_id'];
-            $quantity= data['quantity'];
+            $product_id = $data['product_id'];
+            $quantity= $data['quantity'];
             $data_product = $this->productModel->getById($product_id);
             if ($quantity > $data_product['quantity']){
                 Response::json(409, ['message' => 'Not enough product']);
@@ -68,31 +74,33 @@ class CartController {
     }
 
 
-    public function updateProduct() {
+    public function updateProduct($product_id) {
         try {
             try{
                 $role =$this->auth->getRole();
                 $id = $this->auth->getId();
                 if ($role != "customer"){
-                    Respone::json(403, ['error' => 'Invalid role'])
+                    Respone::json(403, ['error' => 'Invalid role']);
                 }
             }
             catch (Exception $e){
                 Response::json(401, ['error' => $e->getMessage()]);
             }
             $cart_id= $this->cartModel->getCartIDByUserId($id);  
-            if(empty($cart)){
+            if(empty($cart_id)){
                 $cart_id=$this->cartModel->createCartForUser($id);
             }
+            else{
+                $cart_id = $cart_id[0]['cart_id'];
+            }   
             $data = Request::getBody();
-            $product_id = data['product_id'];
-            $quantity= data['quantity'];
+            $quantity= $data['quantity'];
             $data_product = $this->productModel->getById($product_id);
             if ($quantity > $data_product['quantity']){
                 Response::json(409, ['message' => 'Not enough product']);
             }
             $this->cartModel->updateProductInCart($cart_id,$product_id,$quantity);
-            Response::json(201, ['message' => 'Product added successfully']);
+            Response::json(201, ['message' => 'Product updated successfully']);
 
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
@@ -100,26 +108,31 @@ class CartController {
     }
 
 
-    public function removeProduct($cart_id){
+    public function removeProduct($product_id){
         try{            
             try{
                 $role =$this->auth->getRole();
                 $id = $this->auth->getId();
                 if ($role != "customer"){
-                    Respone::json(403, ['error' => 'Invalid role'])
+                    Respone::json(403, ['error' => 'Invalid role']);
                 }
             }
             catch (Exception $e){
                 Response::json(401, ['error' => $e->getMessage()]);
             }
             $cart_id= $this->cartModel->getCartIDByUserId($id);  
+            $cart_id= $this->cartModel->getCartIDByUserId($id);  
+            if(empty($cart_id)){
+                Response::json(409, ['error' => 'Cart is not existed']);
+            }
+            else{
+                $cart_id = $cart_id[0]['cart_id'];
+            }   
             $data = Request::getBody();
-            $product_id = data['product_id'];
-            $quantity= data['quantity'];
             $this->cartModel->deleteProductFromCart($cart_id,$product_id);
             Response::json(201, ['message' => 'Product Deleted successfully']);
         }
-        catch{
+        catch (Exception $e){
             Response::json(500, ['error' => $e->getMessage()]);
         }
 
