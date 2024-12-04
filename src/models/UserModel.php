@@ -23,21 +23,18 @@ class UserModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getByUsername($username) {
-        $query = "SELECT * FROM " . $this->tableName . " WHERE username = :username";
+    public function getByEmail($email) {
+        $query = "SELECT * FROM " . $this->tableName . " WHERE email = :email";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":username", $username);
+        $stmt->bindParam(":email", $email);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function validateAndCreate($data) {
-        // Validate data
-        if (!$this->validateData($data, true)) {
-            throw new Exception('Invalid data');
-        }
+        $this->validateData($data, true);
 
-        // Check if username exists
+
         $existing = $this->getByUsername($data['username']);
         if (count($existing) >= 1) {
             throw new Exception('Username already exists');
@@ -49,7 +46,9 @@ class UserModel {
 
         $stmt = $this->conn->prepare($query);
         $this->bindUserParams($stmt, $data);
-        return $stmt->execute();
+        $stmt->execute();
+        $user_id = $pdo->lastInsertId();
+        return $this->getById($user_id);
     }
 
     public function validateAndUpdate($data) {
@@ -92,15 +91,14 @@ class UserModel {
     }
 
     public function validateLogin($data) {
-        if (!isset($data['username']) || !isset($data['password'])) {
+        if (!isset($data['email']) || !isset($data['password'])) {
             throw new Exception('Username and password are required');
         }
-
-        $users = $this->getByUsername($data['username']);
+        
+        $users = $this->getByEmail($data['email']);
         if (count($users) === 0) {
             throw new Exception('User not found');
         }
-
         $user = $users[0];
         if (!password_verify($data['password'], $user['password_'])) {
             throw new Exception('Invalid password');
@@ -112,7 +110,6 @@ class UserModel {
     private function validateData($data, $isCreate) {
         $rules = [
             'name' => 'required|max',
-            'username' => 'required|min|max',
             'gender' => 'required|gender',
             'birthday' => 'required',
             'email' => 'required|email'
@@ -128,19 +125,15 @@ class UserModel {
     private function bindUserParams($stmt, $data) {
         // Create variables to hold the values
         $name = $data['name'] ?? '';
-        $username = $data['username'] ?? '';
         $gender = $data['gender'] ?? '';
         $birthday = $data['birthday'] ?? '';
         $email = $data['email'] ?? '';
 
         // Bind using variables
         $stmt->bindParam(":name", $name);
-        $stmt->bindParam(":username", $username); 
         $stmt->bindParam(":gender", $gender);
         $stmt->bindParam(":birthday", $birthday);
         $stmt->bindParam(":email", $email);
-        
-        // Only bind password and role for create operation
         if (isset($data['password'])) {
             $password = $data['password'];
             $role = $data['role'] ?? 'customer'; // Default to customer

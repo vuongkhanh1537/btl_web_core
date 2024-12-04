@@ -10,7 +10,6 @@ class OrderController {
 
     public function index() {
         try {
-            //$this->auth->checkPermission('order', 'read');
             $orders = $this->orderModel->getAll();
             Response::json(200, $orders);
 
@@ -22,16 +21,15 @@ class OrderController {
     public function show($id) {
         try {
             $data = Request::getBody();
-            if()
             $data['order_id'] = $this->orderModel->createOrder($data);
-            $this->orderModel->addProductToOrder($data)
+            $this->orderModel->addProductToOrder($data);                              
             if ($this->productModel->validateAndCreate($data)) {
                 Response::json(201, ['message' => 'Order created successfully',
                                         'order_id'=> $data['id']
                                     ]);
 
-            }
-        } catch (Exception $e) {
+            } 
+        }catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }

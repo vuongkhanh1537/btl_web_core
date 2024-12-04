@@ -8,27 +8,35 @@ class ProductModel {
     }
 
     public function getAll() {
-        $query = "SELECT * FROM " . $this->tableName;
+        $query = "SELECT p.product_id as id, name_ as name, price, category, image_path as image, avg(r.score) as rating   FROM " . $this->tableName . " p inner join review r on p.product_id = r.product_id group by r.product_id
+        UNION 
+        SELECT p.product_id as id, name_ as name, price, category, image_path as image, 0.0 as rating  FROM product p";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getById($id) {
-        $query = "SELECT * FROM " . $this->tableName . " WHERE product_id = ?";
+        $query = "SELECT p.product_id as id, name_ as name, price, color, brand, description_ as description, weight_ as weight, category, image_path as image, quantity,collection_id, avg(r.score) as rating   FROM " . $this->tableName . " p Inner join review r on p.product_id = r.product_id  WHERE p.product_id = ? group by r.product_id
+        UNION
+        SELECT p.product_id as id, name_ as name, price, color, brand, description_ as description, weight_ as weight, category, image_path as image, quantity,collection_id, 0.0 as rating   FROM " . $this->tableName . " p  WHERE p.product_id = ? 
+        ";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $id);
+        $stmt->bindParam(2, $id);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $main_product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $main_product;
     }
 
+
+
     public function validateAndCreate($data) {
-        // Validate data
         if (!$this->validateData($data, true)) {
             throw new Exception('Invalid data');
         }
 
-        // Create product
         $query = "INSERT INTO " . $this->tableName . "
             SET name_ = :name,
                 price = :price,
@@ -52,7 +60,6 @@ class ProductModel {
             throw new Exception('Product not found');
         }
 
-        // Validate provided fields
         if (!$this->validateData($data, false)) {
             throw new Exception('Invalid data');
         }
@@ -152,12 +159,15 @@ class ProductModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getProductInCollection($CollectionId){
+    public function getSimilarProduct($id, $CollectionId){
+        $query = "SELECT proudct_id as id, name_ as name, price, category, image_path as image, description,weight avg(r.score) as rating   FROM " . $this->tableName . " p 
+        Inner join review r on p.product_id = r.product_id group by product_id where p.collection_id = :collection_id and p.product_id = :product_id";
         $query = "SELECT p.* FROM ". $this->tableName . " p 
         inner join collection_ c on c.collection_id = p.collection_id
-        where c.collection_id = :collection_id" ;
+        where c.collection_id = :collection_id AND product_id != :id" ;
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':collection_id', $CollectionId, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -175,12 +185,15 @@ class ProductModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    public function getCollection(){
-
-        $query = "SELECT * FROM collection_";
+    public function updateQuantityProduct($product_id, $quantity){
+        $query = "UPDATE into consisted (cart_id,product_id,quantity) Values (:cart_id,:product_id,:quantity)";
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":cart_id", $cart_id);
+        $stmt->bindParam(":product_id", $product_id);
+        $stmt->bindParam(":quantity", $quantity);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $cart_id;
     }
+    
+
 }
