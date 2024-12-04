@@ -9,10 +9,9 @@ class CartModel {
     }
 
     public function getCartByUserId($id){
-        $query = "SELECT proudct_id as id, name_ as name, price, category, image_path as image, avg(r.score) as rating, quantity, weight, size, color FROM " . $this->tableName . " c where c.user_id =:id Inner join consisted con on c.cart_id = con.cart_id 
-        inner join product p on p.id =con.product_id
-        inner join review r on p.id = r.product_id
-        group by product
+        $query = "SELECT p.product_id as id, name_ as name, price, category, image_path as image, con.quantity, weight_ as weight, size_ as size, color FROM " . $this->tableName . " c  Inner join consisted con on c.cart_id = con.cart_id 
+        inner join product p on p.product_id =con.product_id
+        where c.user_id =:id
         ";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
@@ -21,19 +20,23 @@ class CartModel {
     }
 
     public function getCartIDByUserId($id){
-        $query = "SELECT cart_id as id FROM " . $this->tableName . " c where c.user_id =:id";
+        $query = "SELECT cart_id FROM " . $this->tableName . " c where c.user_id =:id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (empty($data)){
+            echo "true";
+        }
+        return $data;
     }
 
     public function createCartForUser($id){
         $query = "INSERT into cart (user_id) Values (:user_id)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":id", $id);
+        $stmt->bindParam(":user_id", $id);
         $stmt->execute();
-        $cart_id = $pdo->lastInsertId();
+        $cart_id = $this->conn->lastInsertId();
         return $cart_id;
     }
     public function addProductToCart($cart_id,$product_id,$quantity){
@@ -53,11 +56,12 @@ class CartModel {
         $stmt->execute();
     }
 
-    public function updateProductInCart($cart_id,$product_id){
+    public function updateProductInCart($cart_id,$product_id,$quantity){
         $query = "UPDATE consisted SET quantity = :quantity WHERE cart_id = :cart_id AND product_id = :product_id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":cart_id", $cart_id);
         $stmt->bindParam(":product_id", $product_id);
+        $stmt->bindParam(":quantity", $quantity);
         $stmt->execute();
     }
 
