@@ -8,9 +8,9 @@ class ProductModel {
     }
 
     public function getAll() {
-        $query = "SELECT p.product_id as id, name_ as name, price, category, image_path as image, avg(r.score) as rating   FROM " . $this->tableName . " p inner join review r on p.product_id = r.product_id group by r.product_id
+        $query = "SELECT p.product_id as id, name_ as name, price, category, collection_id, image_path as image, avg(r.score) as rating   FROM " . $this->tableName . " p inner join review r on p.product_id = r.product_id group by r.product_id
         UNION 
-        SELECT p.product_id as id, name_ as name, price, category, image_path as image, 0.0 as rating  FROM product p";
+        SELECT p.product_id as id, name_ as name, price, category, collection_id, image_path as image, 0.0 as rating  FROM product p";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
