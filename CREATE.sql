@@ -64,7 +64,7 @@ create table  order_(
 
 
 create table  cart(
-	cart_id int NOT NULL primary key,
+	cart_id int NOT NULL AUTO_INCREMENT primary key,
     user_id int not NULL,
     foreign key (user_id) references user(user_id) On update restrict on delete restrict
 );
