@@ -32,7 +32,8 @@ class UserModel {
     }
 
     public function validateAndCreate($data) {
-        $this->validateData($data, true);
+        if(!$this->validateData($data, true))
+            throw new Exception("Invalid data");
 
 
         $existing = $this->getByEmail($data['email']);
@@ -51,9 +52,9 @@ class UserModel {
         return $this->getById($user_id);
     }
 
-    public function validateAndUpdate($data) {
+    public function validateAndUpdate($user_id,$data) {
         // Check if user exists
-        $existing = $this->getById($data['user_id']);
+        $existing = $this->getById($user_id);
         if (!$existing) {
             throw new Exception('User not found');
         }
@@ -63,20 +64,19 @@ class UserModel {
             throw new Exception('Invalid data');
         }
 
-        // Merge with existing data
-        $updateData = array_merge($existing, $data);
-
         $query = "UPDATE " . $this->tableName . " SET 
             name_ = :name,
-            username = :username,
             gender = :gender,
             birthday = :birthday,
-            email = :email
+            password_ = :password
             WHERE user_id = :user_id";
 
         $stmt = $this->conn->prepare($query);
-        $this->bindUserParams($stmt, $updateData);
-        $stmt->bindParam(":user_id", $data['user_id']);
+        $stmt->bindParam(":name", $data['name']);
+        $stmt->bindParam(":gender", $data['gender']);
+        $stmt->bindParam(":birthday", $data['birthday']);
+        $stmt->bindParam(":password", $data['password']);
+        $stmt->bindParam(":user_id", $user_id);
         return $stmt->execute();
     }
 
@@ -111,7 +111,7 @@ class UserModel {
         $rules = [
             'name' => 'required|max',
             'gender' => 'required|gender',
-            'birthday' => 'required',
+            'birthday' => 'required|date',
             'email' => 'required|email'
         ];
 

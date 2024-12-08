@@ -186,15 +186,48 @@ where p.collection_id = :collection_id and p.product_id != :product_id
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function updateQuantityProduct($product_id, $quantity){
-        $query = "UPDATE into consisted (cart_id,product_id,quantity) Values (:cart_id,:product_id,:quantity)";
+    public function createReview($data){
+
+
+        $query="SELECT COUNT(*) AS row_count
+        FROM review
+        WHERE product_id = :product_id AND reviewer_id = :reviewer_id;
+        ";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(":cart_id", $cart_id);
-        $stmt->bindParam(":product_id", $product_id);
-        $stmt->bindParam(":quantity", $quantity);
+        $stmt->bindParam(':product_id', $data['product_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':reviewer_id', $data['user_id'], PDO::PARAM_INT);
         $stmt->execute();
-        return $cart_id;
+        $data['ordinal_number'] =$stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $query = "INSERT INTO review 
+        (product_id, ordinal_number, content, time_, reviewer_id, score) 
+        VALUES 
+        (:product_id, :ordinal_number, :content, :time_, :reviewer_id, :score)";
+        
+ 
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':product_id', $data['product_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':ordinal_number', $data['ordinal_number'], PDO::PARAM_INT);
+        $stmt->bindParam(':content', $data['comment'], PDO::PARAM_STR);
+        $stmt->bindParam(':time_', $data['datetime'], PDO::PARAM_STR);
+        $stmt->bindParam(':reviewer_id', $data['user_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':score', $data['rating'], PDO::PARAM_INT);
+        $stmt->execute();
     }
+    // public function getQuantity($Cartid){
+    //     if (!$this->getById($Cartid)) {
+    //         throw new Exception('Cart not found');
+    //     }
+    //     $query = "SELECT r.*, u.name_  FROM review r
+    //         inner join user u on u.user_id = r.reviewer_id
+    //         where r.product_id = :product_id";
+    //     $stmt = $this->conn->prepare($query);
+    //     $stmt->bindParam(':product_id', $id, PDO::PARAM_INT);
+
+    //     $stmt->execute();
+    //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // }
+
     
 
 }

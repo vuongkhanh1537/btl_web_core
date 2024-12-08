@@ -16,14 +16,14 @@ class CartController {
             $role =$this->auth->getRole();
             $id = $this->auth->getId();
             if ($role != "customer"){
-                Respone::json(403, ['error' => 'Invalid role']);
+                Response::json(403, ['error' => 'Invalid role']);
             }
         }
         catch (Exception $e){
             Response::json(401, ['error' => $e->getMessage()]);
         }
         try {
-            $data = Request::getBody();
+            $data = Request::getBody();            
             $cart = $this->cartModel->getCartByUserId($id);                 
             if ($cart) {
                 Response::json(200, [
@@ -42,7 +42,7 @@ class CartController {
                 $role =$this->auth->getRole();
                 $id = $this->auth->getId();
                 if ($role != "customer"){
-                    Respone::json(403, ['error' => 'Invalid role']);
+                    Response::json(403, ['error' => 'Invalid role']);
                 }
             }
             catch (Exception $e){
@@ -59,7 +59,7 @@ class CartController {
 
             
             $data = Request::getBody();
-            $product_id = $data['product_id'];
+            $product_id = $data['id'];
             $quantity= $data['quantity'];
             $data_product = $this->productModel->getById($product_id);
             if ($quantity > $data_product['quantity']){
@@ -80,7 +80,7 @@ class CartController {
                 $role =$this->auth->getRole();
                 $id = $this->auth->getId();
                 if ($role != "customer"){
-                    Respone::json(403, ['error' => 'Invalid role']);
+                    Response::json(403, ['error' => 'Invalid role']);
                 }
             }
             catch (Exception $e){
@@ -114,13 +114,12 @@ class CartController {
                 $role =$this->auth->getRole();
                 $id = $this->auth->getId();
                 if ($role != "customer"){
-                    Respone::json(403, ['error' => 'Invalid role']);
+                    Response::json(403, ['error' => 'Invalid role']);
                 }
             }
             catch (Exception $e){
                 Response::json(401, ['error' => $e->getMessage()]);
             }
-            $cart_id= $this->cartModel->getCartIDByUserId($id);  
             $cart_id= $this->cartModel->getCartIDByUserId($id);  
             if(empty($cart_id)){
                 Response::json(409, ['error' => 'Cart is not existed']);

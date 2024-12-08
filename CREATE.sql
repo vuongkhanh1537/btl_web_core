@@ -38,10 +38,7 @@ create table  promotion_code(
     name_ varchar(255) NOT NULL,
     start_date datetime NOT NULL, 
     end_date datetime NOT NULL,
-    min_order int NOT NULL,
-    maximum_promo int NOT NULL,
-    promo_value double NOT NULL,
-    init_quantity int NOT NULL
+    promo_value double NOT NULL
 );
 
 
@@ -65,7 +62,7 @@ create table  order_(
 
 create table  cart(
 	cart_id int NOT NULL AUTO_INCREMENT primary key,
-    user_id int not NULL,
+    user_id int not NULL unique,
     foreign key (user_id) references user(user_id) On update restrict on delete restrict
 );
 
@@ -85,7 +82,7 @@ create table  consisted(
     product_id int not NULL,
     quantity int not NULL,
     foreign key (product_id) references product(product_id) On update cascade on delete cascade,
-    foreign key (cart_id) references cart(cart_id) On update restrict on delete restrict,
+    foreign key (cart_id) references cart(cart_id) On update cascade on delete cascade,
 	 CONSTRAINT pk_consisted PRIMARY KEY (cart_id, product_id)
 );
 
