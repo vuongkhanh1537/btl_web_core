@@ -9,7 +9,7 @@ class CartModel {
     }
 
     public function getCartByUserId($id){
-        $query = "SELECT p.product_id as id, name_ as name, price, category, image_path as image, con.quantity, weight_ as weight, size_ as size, color FROM " . $this->tableName . " c  Inner join consisted con on c.cart_id = con.cart_id 
+        $query = "SELECT p.product_id as id, name_ as name, price, category, image_path as image, con.quantity as quantity, weight_ as weight, size_ as size, color, p.quantity as product_quantity FROM " . $this->tableName . " c  Inner join consisted con on c.cart_id = con.cart_id 
         inner join product p on p.product_id =con.product_id
         where c.user_id =:id
         ";
@@ -25,9 +25,6 @@ class CartModel {
         $stmt->bindParam(":id", $id);
         $stmt->execute();
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($data)){
-            echo "true";
-        }
         return $data;
     }
 
@@ -64,6 +61,11 @@ class CartModel {
         $stmt->bindParam(":quantity", $quantity);
         $stmt->execute();
     }
-
+    public function deleteCart( $user_id ){
+        $query = "DELETE FROM cart WHERE user_id = :user_id";
+        $stmt=$this->conn->prepare($query) ; 
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+    }
 }
 ?>

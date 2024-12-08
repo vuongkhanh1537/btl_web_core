@@ -5,7 +5,7 @@ class OrderController {
 
     public function __construct($db) {
         $this->orderModel = new OrderModel($db);
-        $this->auth = new Auth();
+        $this->auth = new Authorization();
     }
 
     public function index() {

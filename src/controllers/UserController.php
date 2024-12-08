@@ -56,6 +56,8 @@ class UserController {
                         'id' =>$user['user_id'],
                         'email' => $user['email'],
                         'name' => $user['name_'],
+                        'birthday' => $user['birthday'],
+                        'gender' => $user['gender'],
                         'role' => $user['role_']
                     ],
                     'token' => $token
@@ -86,16 +88,16 @@ class UserController {
         }
     }
 
-    public function update($id) {
+    public function update() {
         try {
             $data = Request::getBody();
-            $data['user_id'] = $id;
-            
-            if ($this->userModel->validateAndUpdate($data)) {
-                Response::json(200, ['message' => 'User updated successfully']);
+            $user_id = $this->auth->getId();
+            $data['password'] =  password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);;
+            if ($this->userModel->validateAndUpdate($user_id,$data)) {
+                Response::json(200, ['message' => 'User information updated successfully']);
             }
         } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
+            Response::json(400, ['error' => $e->getMessage()]);
         }
     }
 
@@ -108,5 +110,4 @@ class UserController {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
-
 }

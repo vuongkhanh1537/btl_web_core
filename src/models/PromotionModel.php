@@ -27,7 +27,7 @@ class ProductModel {
         $stmt->bindParam(':promo_value', $data['promo_value'], PDO::PARAM_STR); 
         $stmt->bindParam(':init_quantity', $data['init_quantity'], PDO::PARAM_INT);
         $stmt->execute();
-        $code_id = $pdo->lastInsertId();
+        $code_id = $this->conn->lastInsertId();
         return $code_id;
     }
     
