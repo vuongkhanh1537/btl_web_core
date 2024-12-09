@@ -43,10 +43,12 @@ class ProductModel {
                 description_ = :description,
                 color = :color,
                 brand = :brand,
+                image_path = :image_path,
                 weight_ = :weight,
                 size_ = :size,
                 quantity = :quantity,
-                category = :category";
+                category = :category,
+                collection_id = :collection_id";
 
         $stmt = $this->conn->prepare($query);
         $this->bindProductParams($stmt, $data);
@@ -74,10 +76,12 @@ class ProductModel {
                 description_ = :description,
                 color = :color,
                 brand = :brand,
+                image_path = :image_path,
                 weight_ = :weight,
                 size_ = :size,
                 quantity = :quantity,
-                category = :category
+                category = :category,
+                collection_id = :collection_id
             WHERE product_id = :id";
 
         $stmt = $this->conn->prepare($query);
@@ -93,10 +97,12 @@ class ProductModel {
             'color' => 'required',
             'brand' => 'required',
             'description' => 'required',
+            'image_path' => 'required',
             'weight' => 'required|numeric',
             'size' => 'required|numeric',
             'quantity' => 'required|numeric',
-            'category' => 'required'
+            'category' => 'required|in:Men,Women,Unisex',
+            'collection_id' => 'required|numeric'
         ];
 
         if (!$isCreate) {
@@ -113,10 +119,12 @@ class ProductModel {
         $stmt->bindParam(":description", $data['description']);
         $stmt->bindParam(":color", $data['color']);
         $stmt->bindParam(":brand", $data['brand']);
+        $stmt->bindParam(":image_path", $data['image_path']);
         $stmt->bindParam(":weight", $data['weight']);
-        $stmt->bindParam(":size", $data['size']);
+        $stmt->bindParam(":size", $data['size']); 
         $stmt->bindParam(":quantity", $data['quantity']);
         $stmt->bindParam(":category", $data['category']);
+        $stmt->bindParam(":collection_id", $data['collection_id']);
     }
 
     public function delete($id) {
