@@ -8,7 +8,7 @@ class ProductModel {
     }
 
     public function getAll() {
-        $query = "SELECT p.product_id as id, name_ as name, price, category, collection_id, image_path as image, avg(r.score) as rating   FROM " . $this->tableName . " p inner join review r on p.product_id = r.product_id group by r.product_id
+        $query = "SELECT p.product_id as id, name_ as name, price, color, weight_ as weight, size_ as size, category, collection_id, image_path as image, avg(r.score) as rating   FROM " . $this->tableName . " p inner join review r on p.product_id = r.product_id group by r.product_id
         UNION 
         SELECT p.product_id as id, name_ as name, price, category, collection_id, image_path as image, 5.0 as rating  FROM product p";
         $stmt = $this->conn->prepare($query);
