@@ -24,7 +24,7 @@ class OrderModel {
 
     public function getAllByUserId($id) {
         $ordersQuery = "
-        SELECT order_id, status_ AS status, total_payment AS total_price
+        SELECT order_id, status_ AS status, total_payment AS total_price, order_time as order_time
         FROM order_
         where user_id=:user_id
     ";
@@ -42,7 +42,7 @@ class OrderModel {
 
             $stmt = $this->conn->prepare($itemsQuery);
             foreach ($orders as $index => $order) {
-                $stmt->bindValue($index + 1, $order, PDO::PARAM_INT);
+                $stmt->bindValue($index + 1, $order['order_id'], PDO::PARAM_INT);
             }
             $stmt->execute();
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -64,6 +64,7 @@ class OrderModel {
                 'status'      => $order['status'],
                 'items'       => $itemsByOrderId[$order['order_id']] ?? [],
                 'total_price' => (int) $order['total_price'],
+                'order_time'   => $order['order_time'] 
             ];
         }
             return $result;
