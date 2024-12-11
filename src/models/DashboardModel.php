@@ -107,4 +107,48 @@ class DashboardModel {
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function getTotalCompletedOrderCount($startDate = null, $endDate = null) {
+        $query = "SELECT COUNT(*) as total_order_completed 
+                 FROM order_ 
+                 WHERE payment_status = 'Completed'";
+                 
+        if ($startDate && $endDate) {
+            $query .= " AND order_time BETWEEN :start_date AND :end_date";
+        }
+        
+        $stmt = $this->conn->prepare($query);
+        if ($startDate && $endDate) {
+            $stmt->bindParam(':start_date', $startDate);
+            $stmt->bindParam(':end_date', $endDate); 
+        }
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function getRevenueByMonth($year) {
+        $query = "SELECT 
+                    DATE_FORMAT(order_time, '%M') as month,
+                    DATE_FORMAT(order_time, '%m') as month_num,
+                    SUM(total_payment) as revenue
+                  FROM order_
+                  WHERE YEAR(order_time) = :year 
+                    AND payment_status = 'Completed'
+                  GROUP BY DATE_FORMAT(order_time, '%M'), 
+                           DATE_FORMAT(order_time, '%m')
+                  ORDER BY month_num";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':year', $year, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Clean up results to remove month_num from output
+        return array_map(function($row) {
+            unset($row['month_num']);
+            $row['revenue'] = (float)$row['revenue'];
+            return $row;
+        }, $results);
+    }
 }

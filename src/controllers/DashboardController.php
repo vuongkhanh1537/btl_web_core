@@ -86,4 +86,31 @@ class DashboardController {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
+
+    public function getTotalCompletedOrders() {
+        try {
+            $dateRange = $this->getDateRange();
+            $count = $this->dashboardModel->getTotalCompletedOrderCount(
+                $dateRange['start_date'], 
+                $dateRange['end_date']
+            );
+            Response::json(200, ['data' => $count]);
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+    
+    public function getMonthlyRevenue() {
+        try {
+            $queryParams = Request::getQueryParams();
+            $year = isset($queryParams['year']) ? 
+                    (int)$queryParams['year'] : 
+                    (int)date('Y');
+                    
+            $revenue = $this->dashboardModel->getRevenueByMonth($year);
+            Response::json(200, ['data' => $revenue]);
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
 }
