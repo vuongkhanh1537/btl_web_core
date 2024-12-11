@@ -144,9 +144,7 @@ class OrderModel {
     }
 
     public function validateAndCreate($data) {
-        if (!$this->validateData($data, true)) {
-            throw new Exception('Invalid data');
-        }
+        
         $data['payment_status'] = "Not Completed";
         $data['status_']="Shipping";
         $query = "SELECT promo_value, start_date, end_date FROM promotions WHERE code_id = ?";
@@ -168,7 +166,9 @@ class OrderModel {
                 throw new Exception('Invalid promotioin code');
             }
         } 
-
+        if (!$this->validateData($data, true)) {
+            throw new Exception('Invalid data');
+        }
         $query = "INSERT INTO order_ 
         SET 
             order_time = :order_time,
