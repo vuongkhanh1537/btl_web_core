@@ -25,15 +25,13 @@ class OrderModel {
     public function getAllByUserId($id) {
         $ordersQuery = "
         SELECT order_id, status_ AS status, total_payment AS total_price
-        FROM order_;
+        FROM order_
         where user_id=:user_id
     ";
         $stmt = $this->conn->prepare($ordersQuery);
         $stmt->bindParam(":user_id", $id);
         $stmt->execute();
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
         $placeholders = implode(',', array_fill(0, count($orders), '?'));
         if (!empty($orders)){
             $itemsQuery = "
@@ -43,7 +41,10 @@ class OrderModel {
         ";
 
             $stmt = $this->conn->prepare($itemsQuery);
-            $stmt->execute($orders);
+            foreach ($orders as $index => $order) {
+                $stmt->bindValue($index + 1, $order, PDO::PARAM_INT);
+            }
+            $stmt->execute();
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
        

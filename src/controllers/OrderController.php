@@ -135,10 +135,10 @@ class OrderController {
             }
             $data['items'] =$cart;
             $data['user_id'] = $this->auth->getId();
-            if ($this->orderModel->validateAndCreate($data)) {
-                $this->cartModel->deleteCart($id);
-                Response::json(201, ['message' => 'Order created successfully']);
-            }
+            $order_id=$this->orderModel->validateAndCreate($data);
+            $this->cartModel->deleteCart($id);
+            Response::json(201, ['message' => 'Order created successfully', 'data'=>['id'=>$order_id]]);
+            
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
