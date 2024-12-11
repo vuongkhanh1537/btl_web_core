@@ -147,11 +147,15 @@ class OrderModel {
         
         $data['payment_status'] = "Not Completed";
         $data['status_']="Shipping";
-        $query = "SELECT promo_value, start_date, end_date FROM promotions WHERE code_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param(1, $data['discount_code']); // Bind the promo ID as an integer
-        $stmt->execute();
-        $result = $stmt->get_result();
+
+        if ($data["discount_code"] !=""){
+            $query = "SELECT promo_value, start_date, end_date FROM promotions WHERE code_id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param(1, $data['discount_code']); // Bind the promo ID as an integer
+            $stmt->execute();
+            $result = $stmt->get_result();
+        }
+        
     
         if ($result->num_rows > 0) {
             $promo = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -161,11 +165,13 @@ class OrderModel {
     
             if ($currentDate >= $startDate && $currentDate <= $endDate) {
                 $data['total_payment']=$data['total_payment']*(1-$promo['promo_value']);
-                $data['discount']=-$promo['promo_value'];
+                $data['discount']=$data['total_payment']*$promo['promo_value'];
             } else {
                 throw new Exception('Invalid promotioin code');
             }
-        } 
+        } else {
+            $data['discount']=0;
+        }
         if (!$this->validateData($data, true)) {
             throw new Exception('Invalid data');
         }
