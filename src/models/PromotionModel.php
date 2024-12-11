@@ -54,7 +54,7 @@ class PromotionModel {
     }
 
     public function delete($id) {
-        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        $query = "DELETE FROM " . $this->table . " WHERE code_id = :id";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([':id' => $id]);
     }
