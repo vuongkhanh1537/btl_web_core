@@ -113,4 +113,31 @@ class DashboardController {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
+
+    public function updateOrderStatus($id) {
+        try {
+            $data = Request::getBody();
+            
+            // Validate input
+            if (!isset($data['payment_status']) || !isset($data['status_'])) {
+                Response::json(400, ['error' => 'Invalid input']);
+                return;
+            }
+    
+            $validPaymentStatuses = ['Completed', 'Not Completed', 'Cancelled'];
+            $validStatuses = ['Completed', 'Shipping', 'Cancelled'];
+    
+            if (!in_array($data['payment_status'], $validPaymentStatuses) || !in_array($data['status_'], $validStatuses)) {
+                Response::json(400, ['error' => 'Invalid status values']);
+                return;
+            }
+    
+            // Update order status in the model
+            $this->dashboardModel->updateOrderStatus($id, $data['payment_status'], $data['status_']);
+    
+            Response::json(200, ['message' => 'Order updated successfully']);
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
 }

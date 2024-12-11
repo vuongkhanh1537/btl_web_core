@@ -68,5 +68,6 @@ class Routes {
         $this->router->addRoute("GET", "/api/dashboard/count", "DashboardController", "getTotalOrderCount");
         $this->router->addRoute("GET", "/api/dashboard/orders/completed", "DashboardController", "getTotalCompletedOrders");
         $this->router->addRoute("GET", "/api/dashboard/revenue/monthly", "DashboardController", "getMonthlyRevenue");
+        $this->router->addRoute("PUT", "/api/dashboard/orders/{id}", "DashboardController", "updateOrderStatus");
     }
 }

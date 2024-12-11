@@ -151,4 +151,16 @@ class DashboardModel {
             return $row;
         }, $results);
     }
+
+    public function updateOrderStatus($orderId, $paymentStatus, $status) {
+        $query = "UPDATE order_ 
+                  SET payment_status = :payment_status, status_ = :status_
+                  WHERE order_id = :order_id";
+    
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':payment_status', $paymentStatus, PDO::PARAM_STR);
+        $stmt->bindParam(':status_', $status, PDO::PARAM_STR);
+        $stmt->bindParam(':order_id', $orderId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
 }
