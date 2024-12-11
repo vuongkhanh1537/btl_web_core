@@ -90,6 +90,7 @@ create table  consisted(
 CREATE table  own (
 	user_id int  NOT NULL,
     promotion_code_id int NOT NULL,
+    quantity INT UNSIGNED ,
     CONSTRAINT pk_own PRIMARY KEY (user_id, promotion_code_id),
     foreign key (user_id) references user (user_id) On update restrict on delete restrict,
     foreign key (promotion_code_id) references promotion_code (code_id) On update restrict on delete restrict
