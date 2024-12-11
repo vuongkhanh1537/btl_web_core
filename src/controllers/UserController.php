@@ -11,7 +11,7 @@ class UserController {
     public function getAllCustomers() {
         try {
             $role = $this->auth->getRole();
-            if ($role !== 'admin') {
+            if ($role !== 'manager') {
                 Response::json(403, ['error' => 'Unauthorized access']);
                 return;
             }
