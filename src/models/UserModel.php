@@ -8,6 +8,13 @@ class UserModel {
         $this->conn = $db;
     }
 
+    public function getAllCustomers() {
+        $query = "SELECT * FROM " . $this->tableName . " WHERE role_ = 'customer'";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     public function getAll() {
         $query = "SELECT * FROM " . $this->tableName;
         $stmt = $this->conn->prepare($query);

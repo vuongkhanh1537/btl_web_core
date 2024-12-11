@@ -22,6 +22,7 @@ class Routes {
         // User routes
         $this->router->addRoute("GET", "/api/users", "UserController", "index");
         $this->router->addRoute("GET", "/api/users/{id}", "UserController", "show");
+        $this->router->addRoute("GET", "/api/customers", "UserController", "getAllCustomers");
         $this->router->addRoute("POST", "/api/signup", "UserController", "signup");
         $this->router->addRoute("POST", "/api/login", "UserController", "login");
         $this->router->addRoute("PUT", "/api/users", "UserController", "update");
@@ -41,6 +42,14 @@ class Routes {
         $this->router->addRoute("POST", "/api/collections", "CollectionController", "create");
         $this->router->addRoute("PUT", "/api/collections/{id}", "CollectionController", "update");
         $this->router->addRoute("DELETE", "/api/collections/{id}", "CollectionController", "delete");
+
+
+        // Promotion routes
+        $this->router->addRoute("GET", "/api/promotions", "PromotionController", "index");
+        $this->router->addRoute("POST", "/api/promotions", "PromotionController", "create"); 
+        $this->router->addRoute("PUT", "/api/promotions/{id}", "PromotionController", "update");
+        $this->router->addRoute("DELETE", "/api/promotions/{id}", "PromotionController", "delete");
+
 
 
         // Cart routes
