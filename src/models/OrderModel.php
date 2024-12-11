@@ -35,8 +35,9 @@ class OrderModel {
         $placeholders = implode(',', array_fill(0, count($orders), '?'));
         if (!empty($orders)){
             $itemsQuery = "
-            SELECT order_id, product_id, quantity, price
+            SELECT order_id, p.product_id, p.name_ as name, contain.quantity, contain.price
             FROM contain
+            Inner Join product p on p.product_id = contain.product_id
             WHERE order_id IN ($placeholders);
         ";
 
@@ -55,6 +56,7 @@ class OrderModel {
                 'product_id' => (int) $item['product_id'],
                 'quantity'   => (int) $item['quantity'],
                 'price'      => (int) $item['price'],
+                'name'       =>  $item['name'],
             ];
         }
         $result = ['orders' => []];
