@@ -63,9 +63,8 @@ class Routes {
 
         // Dashboard routes
         $this->router->addRoute("GET", "/api/revenue", "DashboardController", "getTotalRevenue");
-        $this->router->addRoute("GET", "/api/products/top-selling", "DashboardController", "getTopSellingProducts");
-        $this->router->addRoute("GET", "/api/sales/category", "DashboardController", "getSalesByCategory");
-        $this->router->addRoute("GET", "/api/orders/count", "DashboardController", "getTotalOrderCount");
-         $this->router->addRoute("GET", "/api/orders/count", "DashboardController", "getTotalOrderCount");
+        $this->router->addRoute("GET", "/api/dashboard/top-selling", "DashboardController", "getTopSellingProducts");
+        $this->router->addRoute("GET", "/api/dashboard/category", "DashboardController", "getSalesByCategory");
+        $this->router->addRoute("GET", "/api/dashboard/count", "DashboardController", "getTotalOrderCount");
     }
 }

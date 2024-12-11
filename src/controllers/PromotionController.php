@@ -28,11 +28,11 @@ class PromotionController {
 
     public function create() {
         try {
-            $role = $this->auth->getRole();
-            if ($role !== 'admin') {
-                Response::json(403, ['error' => 'Unauthorized access']);
-                return;
-            }
+            // $role = $this->auth->getRole();
+            // if ($role !== 'admin') {
+            //     Response::json(403, ['error' => 'Unauthorized access']);
+            //     return;
+            // }
 
             $data = Request::getBody();
             if ($this->promotionModel->validateAndCreate($data)) {
@@ -47,11 +47,11 @@ class PromotionController {
 
     public function update($id) {
         try {
-            $role = $this->auth->getRole();
-            if ($role !== 'admin') {
-                Response::json(403, ['error' => 'Unauthorized access']);
-                return;
-            }
+            // $role = $this->auth->getRole();
+            // if ($role !== 'admin') {
+            //     Response::json(403, ['error' => 'Unauthorized access']);
+            //     return;
+            // }
 
             $data = Request::getBody();
             if ($this->promotionModel->validateAndUpdate($id, $data)) {
@@ -66,11 +66,11 @@ class PromotionController {
 
     public function delete($id) {
         try {
-            $role = $this->auth->getRole();
-            if ($role !== 'admin') {
-                Response::json(403, ['error' => 'Unauthorized access']);
-                return;
-            }
+            // $role = $this->auth->getRole();
+            // if ($role !== 'admin') {
+            //     Response::json(403, ['error' => 'Unauthorized access']);
+            //     return;
+            // }
 
             if ($this->promotionModel->delete($id)) {
                 Response::json(200, [
