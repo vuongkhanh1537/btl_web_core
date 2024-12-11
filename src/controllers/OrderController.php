@@ -83,10 +83,10 @@ class OrderController {
             $details = $this->orderModel->getDetails($id);
             if($role=="customer"){
                 if ($details['user_id'] != $id){
-                    Response::json(403, ['error' => 'Invalid role']);
+                    Response::json(404, ['error' => 'User not ơn that order']);
                 }
             }
-            Response::json(404, ['error' => 'User  not ơn that order']);
+            
         
             if ($details) {
                 Response::json(200, $details);
