@@ -1,30 +1,26 @@
 <?php
-class OrderController {
-    private $orderModel;
+class PromotionController {
+    private $promotionModel;
     private $auth;
 
     public function __construct($db) {
-        $this->orderModel = new OrderModel($db);
+        $this->promotionModel = new PromotionModel($db);
         $this->auth = new Authorization();
     }
 
     public function index() {
         try {
-            $products = $this->productModel->getAll();
-            Response::json(200, $products);
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
+            // $role = $this->auth->getRole();
+            // if ($role !== 'admin') {
+            //     Response::json(403, ['error' => 'Unauthorized access']);
+            //     return;
+            // }
 
-    public function show($id) {
-        try {
-            $product = $this->productModel->getById($id);
-            if ($product) {
-                Response::json(200, $product);
-            } else {
-                Response::json(404, ['error' => 'Order not found']);
-            }
+            $promotions = $this->promotionModel->getAll();
+            Response::json(200, [
+                'message' => 'Get all promotions successfully',
+                'data' => $promotions
+            ]);
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
@@ -32,11 +28,17 @@ class OrderController {
 
     public function create() {
         try {
-            //$this->auth->checkPermission('product', 'create');
+            $role = $this->auth->getRole();
+            if ($role !== 'admin') {
+                Response::json(403, ['error' => 'Unauthorized access']);
+                return;
+            }
+
             $data = Request::getBody();
-            
-            if ($this->productModel->validateAndCreate($data)) {
-                Response::json(201, ['message' => 'Product created successfully']);
+            if ($this->promotionModel->validateAndCreate($data)) {
+                Response::json(201, [
+                    'message' => 'Promotion added successfully'
+                ]);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
@@ -45,11 +47,17 @@ class OrderController {
 
     public function update($id) {
         try {
-            //$this->auth->checkPermission('product', 'update');
+            $role = $this->auth->getRole();
+            if ($role !== 'admin') {
+                Response::json(403, ['error' => 'Unauthorized access']);
+                return;
+            }
+
             $data = Request::getBody();
-            
-            if ($this->productModel->validateAndUpdate($id, $data)) {
-                Response::json(200, ['message' => 'Product updated successfully']);
+            if ($this->promotionModel->validateAndUpdate($id, $data)) {
+                Response::json(200, [
+                    'message' => 'Promotion updated successfully'
+                ]);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
@@ -58,45 +66,19 @@ class OrderController {
 
     public function delete($id) {
         try {
-            //$this->auth->checkPermission('product', 'delete');
-            if ($this->productModel->delete($id)) {
-                Response::json(200, ['message' => 'Product deleted successfully']);
-            } else {
-                Response::json(500, ['error' => 'Failed to delete product']);
+            $role = $this->auth->getRole();
+            if ($role !== 'admin') {
+                Response::json(403, ['error' => 'Unauthorized access']);
+                return;
+            }
+
+            if ($this->promotionModel->delete($id)) {
+                Response::json(200, [
+                    'message' => 'Promotion deleted successfully'
+                ]);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
         }
     }
-
-
-    public function getCollection($CollectionId) {
-        try {
-            //$this->auth->checkPermission('product', 'delete');
-            $data=$this->productModel->getProductInCollection($CollectionId);
-            if ($data) {
-                Response::json(200, $data);
-            } else {
-                Response::json(404, ['error' => 'Collection not found']);
-            }
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-
-    public function getReview($id) {
-        try {
-            $data=$this->productModel->getReview($id);
-            if ($data) {
-                Response::json(200, $data);
-            } else {
-                Response::json(404, ['error' => 'Collection not found']);
-            }
-        } catch (Exception $e) {
-            Response::json(500, ['error' => $e->getMessage()]);
-        }
-    }
-
-
 }

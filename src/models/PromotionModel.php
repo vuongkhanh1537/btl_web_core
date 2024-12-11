@@ -1,43 +1,72 @@
 <?php
-class ProductModel {
+class PromotionModel {
     private $conn;
-    private $tableName = "order_";
+    private $table = 'promotion_code';
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
     public function getAll() {
-        $query = "SELECT * FROM " . $this->tableName. "WHERE NOW() > start_date  AND NOW() < end_date ";
+        $query = "SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function create($data){
-        $query = "INSERT INTO". $this->tableName ."(code_id, name_, start_date, end_date, min_order,maximum_promo,promo_value,init_quantity  )
-        VALUES (:code_id, :name_, :start_date, :end_date, :min_order,:maximum_promo,:promo_value,:init_quantity)";
+    public function validateAndCreate($data) {
+        $this->validate($data);
+        
+        $query = "INSERT INTO " . $this->table . " 
+                (name_, start_date, end_date, promo_value) 
+                VALUES (:name, :start_date, :end_date, :promo_value)";
+
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':code_id', $data['code_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':name_', $data['name_'], PDO::PARAM_STR);
-        $stmt->bindParam(':start_date', $data['start_date'], PDO::PARAM_STR);
-        $stmt->bindParam(':end_date', $data['end_date'], PDO::PARAM_STR);
-        $stmt->bindParam(':min_order', $data['min_order'], PDO::PARAM_INT);
-        $stmt->bindParam(':maximum_promo', $data['maximum_promo'], PDO::PARAM_INT);
-        $stmt->bindParam(':promo_value', $data['promo_value'], PDO::PARAM_STR); 
-        $stmt->bindParam(':init_quantity', $data['init_quantity'], PDO::PARAM_INT);
-        $stmt->execute();
-        $code_id = $this->conn->lastInsertId();
-        return $code_id;
-    }
-    
-    public function getById($id) {
-        $query = "SELECT * FROM " . $this->tableName . " WHERE order_id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $stmt->execute([
+            ':name' => $data['name_'],
+            ':start_date' => $data['start_date'],
+            ':end_date' => $data['end_date'],
+            ':promo_value' => $data['promo_value']
+        ]);
     }
 
+    public function validateAndUpdate($id, $data) {
+        $this->validate($data);
+        
+        $query = "UPDATE " . $this->table . " 
+                SET name_ = :name, 
+                    start_date = :start_date, 
+                    end_date = :end_date, 
+                    promo_value = :promo_value 
+                WHERE id = :id";
 
+        $stmt = $this->conn->prepare($query);
+        $data[':id'] = $id;
+        
+        return $stmt->execute([
+            ':id' => $id,
+            ':name' => $data['name_'],
+            ':start_date' => $data['start_date'],
+            ':end_date' => $data['end_date'],
+            ':promo_value' => $data['promo_value']
+        ]);
+    }
+
+    public function delete($id) {
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([':id' => $id]);
+    }
+
+    private function validate($data) {
+        $rules = [
+            'name_' => 'required|string',
+            'start_date' => 'required|datetime',
+            'end_date' => 'required|datetime',
+            'promo_value' => 'required|numeric'
+        ];
+        
+        return Validator::validate($data, $rules);
+    }
 }

@@ -8,6 +8,21 @@ class UserController {
         $this->auth = new Authorization();
     }
 
+    public function getAllCustomers() {
+        try {
+            $role = $this->auth->getRole();
+            if ($role !== 'admin') {
+                Response::json(403, ['error' => 'Unauthorized access']);
+                return;
+            }
+
+            $users = $this->userModel->getAllCustomers();
+            Response::json(200, $users);
+        } catch (Exception $e) {
+            Response::json(500, ['error' => $e->getMessage()]);
+        }
+    }
+
     public function signup() {
         try {
             $data = Request::getBody();
