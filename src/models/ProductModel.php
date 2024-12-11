@@ -8,20 +8,89 @@ class ProductModel {
     }
 
     public function getAll() {
-        $query = "SELECT p.product_id as id, name_ as name, price, color, weight_ as weight, size_ as size, category, collection_id, image_path as image, avg(r.score) as rating   FROM " . $this->tableName . " p inner join review r on p.product_id = r.product_id group by r.product_id
+        $query = "SELECT 
+            p.product_id as id, 
+            name_ as name, 
+            price, 
+            color, 
+            brand,
+            description_ as description,
+            weight_ as weight,
+            size_ as size, 
+            category, 
+            image_path as image,
+            quantity,
+            collection_id,
+            avg(r.score) as rating   
+        FROM " . $this->tableName . " p 
+        INNER JOIN review r on p.product_id = r.product_id 
+        GROUP BY p.product_id, p.name_, p.price, p.color, p.brand,
+                p.description_, p.weight_, p.size_, p.category,
+                p.image_path, p.quantity, p.collection_id
 
         UNION 
-        SELECT p.product_id as id, name_ as name, price, category, collection_id, image_path as image, quantity, collection_id, 0.0 as rating  FROM product p";
+
+        SELECT 
+            p.product_id as id,
+            name_ as name,
+            price,
+            color,
+            brand,
+            description_ as description,
+            weight_ as weight,
+            size_ as size,
+            category,
+            image_path as image,
+            quantity,
+            collection_id,
+            5.0 as rating
+        FROM " . $this->tableName . " p 
+        WHERE p.product_id NOT IN (
+            SELECT DISTINCT product_id FROM review
+        )";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     public function getById($id) {
-        $query = "SELECT p.product_id as id, name_ as name, price, color, brand, description_ as description, weight_ as weight, category, image_path as image, quantity,collection_id, avg(r.score) as rating   FROM " . $this->tableName . " p Inner join review r on p.product_id = r.product_id  WHERE p.product_id = ? group by r.product_id
-        UNION
-        SELECT p.product_id as id, name_ as name, price, color, brand, description_ as description, weight_ as weight, category, image_path as image, quantity,collection_id, 5.0 as rating   FROM " . $this->tableName . " p  WHERE p.product_id = ? 
-        ";
+        $query = "SELECT p.product_id as id, 
+                        name_ as name, 
+                        price, 
+                        color, 
+                        brand, 
+                        description_ as description, 
+                        weight_ as weight,
+                        size_ as size, 
+                        category, 
+                        image_path as image, 
+                        quantity,
+                        collection_id, 
+                        avg(r.score) as rating   
+                FROM " . $this->tableName . " p 
+                INNER JOIN review r on p.product_id = r.product_id  
+                WHERE p.product_id = ? 
+                GROUP BY p.product_id, p.name_, p.price, p.color, p.brand, 
+                        p.description_, p.weight_, p.size_, p.category, 
+                        p.image_path, p.quantity, p.collection_id
+                UNION
+                SELECT p.product_id as id,
+                        name_ as name, 
+                        price, 
+                        color, 
+                        brand, 
+                        description_ as description, 
+                        weight_ as weight,
+                        size_ as size, 
+                        category, 
+                        image_path as image, 
+                        quantity,
+                        collection_id,
+                        5.0 as rating   
+                FROM " . $this->tableName . " p  
+                WHERE p.product_id = ?";
+
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $id);
         $stmt->bindParam(2, $id);

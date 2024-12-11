@@ -45,8 +45,18 @@ class ProductController {
         try {
             $data = Request::getBody();
             
-            if ($this->productModel->validateAndCreate($data)) {
-                Response::json(201, ['message' => 'Product created successfully']);
+            $newProductId = $this->productModel->validateAndCreate($data);
+            if ($newProductId) {
+                // Get the created product details
+                $product = $this->productModel->getById($newProductId);
+                
+                Response::json(201, [
+                    'message' => 'Product created successfully',
+                    'data' => [
+                        'product_id' => $newProductId,
+                        'image_path' => $product['image']
+                    ]
+                ]);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
