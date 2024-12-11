@@ -122,7 +122,10 @@ class ProductModel {
 
         $stmt = $this->conn->prepare($query);
         $this->bindProductParams($stmt, $data);
-        return $stmt->execute();
+        $stmt->execute();
+    
+        // Return the new product ID
+        return $this->conn->lastInsertId();
     }
 
     public function validateAndUpdate($id, $data) {
