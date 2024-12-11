@@ -144,32 +144,32 @@ class OrderModel {
     }
 
     public function validateAndCreate($data) {
-        
+        $data['order_time'] = date('Y-m-d H:i:s');
         $data['payment_status'] = "Not Completed";
         $data['status_']="Shipping";
-
+        $data['address_']=$data['delivery_address']['address'];
+        $data['ship_fee'] = $data['delivery_fee'];
+        $data['promotion_code_id']=$data['discount_code'];
         if ($data["discount_code"] !=""){
             $query = "SELECT promo_value, start_date, end_date FROM promotions WHERE code_id = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param(1, $data['discount_code']); // Bind the promo ID as an integer
             $stmt->execute();
             $result = $stmt->get_result();
-        }
+            if ($result->num_rows > 0) {
+                $promo = $result->fetchAll(PDO::FETCH_ASSOC);
+                $currentDate = new DateTime();
+                $startDate = new DateTime($promo['start_date']);
+                $endDate = new DateTime($promo['end_date']);
         
-    
-        if ($result->num_rows > 0) {
-            $promo = $result->fetchAll(PDO::FETCH_ASSOC);
-            $currentDate = new DateTime();
-            $startDate = new DateTime($promo['start_date']);
-            $endDate = new DateTime($promo['end_date']);
-    
-            if ($currentDate >= $startDate && $currentDate <= $endDate) {
-                $data['total_payment']=$data['total_payment']*(1-$promo['promo_value']);
-                $data['discount']=$data['total_payment']*$promo['promo_value'];
-            } else {
-                throw new Exception('Invalid promotioin code');
+                if ($currentDate >= $startDate && $currentDate <= $endDate) {
+                    $data['total_payment']=$data['total_payment']*(1-$promo['promo_value']);
+                    $data['discount']=$data['total_payment']*$promo['promo_value'];
+                } else {
+                    throw new Exception('Invalid promotioin code');
+                }
             }
-        } else {
+        }else {
             $data['discount']=0;
         }
         if (!$this->validateData($data, true)) {
@@ -178,12 +178,10 @@ class OrderModel {
         $query = "INSERT INTO order_ 
         SET 
             order_time = :order_time,
-            shipment_time = :shipment_time,
             ship_fee = :ship_fee,
             payment_status = :payment_status,
             total_payment = :total_payment,
             payment_method = :payment_method,
-            payment_time = :payment_time,
             status_ = :status_,
             address_ = :address_,
             user_id = :user_id,
@@ -196,12 +194,11 @@ class OrderModel {
         $stmt->bindParam(':payment_status', $data['payment_status'], PDO::PARAM_STR);
         $stmt->bindParam(':total_payment', $data['total_payment'], PDO::PARAM_INT);
         $stmt->bindParam(':payment_method', $data['payment_method'], PDO::PARAM_STR);
-        $stmt->bindParam(':status_', $data['status'], PDO::PARAM_STR);
-        $stmt->bindParam(':address_', $data['delivery_address']['address'], PDO::PARAM_STR);
+        $stmt->bindParam(':status_', $data['status_'], PDO::PARAM_STR);
+        $stmt->bindParam(':address_',  $data['address_'], PDO::PARAM_STR);
         $stmt->bindParam(':user_id', $data['user_id'], PDO::PARAM_INT);
         $stmt->bindParam(':promotion_code_id', $data['discount_code'], PDO::PARAM_INT);
         $stmt->bindParam(':discount', $data['discount'], PDO::PARAM_INT);
-        $this->bindOrderParams($stmt, $data);
         $stmt->execute();
         $orderId = $this->conn->lastInsertId();
         $items = $data['items']; 
@@ -211,7 +208,7 @@ class OrderModel {
                             VALUES (:order_id, :product_id, :quantity, :price)";
             $stmtContain = $this->conn->prepare($queryContain);
             $stmtContain->bindParam(':order_id', $orderId);
-            $stmtContain->bindParam(':product_id', $item['product_id'], PDO::PARAM_INT);
+            $stmtContain->bindParam(':product_id', $item['id'], PDO::PARAM_INT);
             $stmtContain->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
             $stmtContain->bindParam(':price', $item['price'], PDO::PARAM_INT);
             $stmtContain->execute();
@@ -256,17 +253,13 @@ class OrderModel {
     private function validateData($data, $isCreate) {
         $rules = [
             'order_time'         => 'required|datetime',
-            'shipment_time'      => 'datetime',
             'ship_fee'           => 'required|numeric',
             'payment_status'     => 'required',
             'total_payment'      => 'required|int',
             'payment_method'     => 'required|max',
-            'payment_time'       => 'datetime',
             'status_'            => 'required',
             'address_'           => 'required|max',
             'user_id'            => 'required|int',
-            'promotion_code_id'  => 'int',
-            'discount'           => 'int'
         ];
         
 

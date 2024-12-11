@@ -133,8 +133,8 @@ class OrderController {
             else{
                 Response::json(404, ['error' => 'Cart do not exist']);
             }
-            
-            
+            $data['items'] =$cart;
+            $data['user_id'] = $this->auth->getId();
             if ($this->orderModel->validateAndCreate($data)) {
                 $this->cartModel->deleteCart($id);
                 Response::json(201, ['message' => 'Order created successfully']);
