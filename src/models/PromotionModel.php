@@ -39,7 +39,7 @@ class PromotionModel {
                     start_date = :start_date, 
                     end_date = :end_date, 
                     promo_value = :promo_value 
-                WHERE id = :id";
+                WHERE code_id = :id";
 
         $stmt = $this->conn->prepare($query);
         $data[':id'] = $id;
