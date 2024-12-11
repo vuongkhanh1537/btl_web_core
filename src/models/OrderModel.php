@@ -42,7 +42,7 @@ class OrderModel {
 
             $stmt = $this->conn->prepare($itemsQuery);
             foreach ($orders as $index => $order) {
-                $stmt->bindValue($index + 1, $order, PDO::PARAM_INT);
+                $stmt->bindValue($index + 1, $order['order_id'], PDO::PARAM_INT);
             }
             $stmt->execute();
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
