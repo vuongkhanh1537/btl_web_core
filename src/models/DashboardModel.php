@@ -94,9 +94,9 @@ class DashboardModel {
     }
 
     public function getTotalOrderCount($startDate = null, $endDate = null) {
-        $query = "SELECT COUNT(*) as total_order_count FROM order_ WHERE payment_status = 'Completed'";
+        $query = "SELECT COUNT(*) as total_order_count FROM order_";
         if ($startDate && $endDate) {
-            $query .= " AND order_time BETWEEN :start_date AND :end_date";
+            $query .= " WHERE order_time BETWEEN :start_date AND :end_date";
         }
         
         $stmt = $this->conn->prepare($query);
