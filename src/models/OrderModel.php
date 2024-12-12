@@ -83,7 +83,7 @@ class OrderModel {
             // Get order details including contained products and user details
             $query = "SELECT o.*, 
                     c.product_id, c.quantity, c.price,
-                    p.name_ as product_name, p.color, p.brand,
+                    p.name_ as product_name, p.color, p.brand, p.image_path,
                     u.user_id, u.name_ as user_name, u.email, u.role_, 
                     u.gender, u.birthday
                 FROM " . $this->tableName . " o
@@ -134,7 +134,8 @@ class OrderModel {
                     'quantity' => $detail['quantity'],
                     'price' => $detail['price'],
                     'color' => $detail['color'],
-                    'brand' => $detail['brand']
+                    'brand' => $detail['brand'],
+                    'image' => $detail['image_path'] // Add this line
                 ];
             }
     
