@@ -67,31 +67,28 @@ class OrderController {
         }
     }
 
-    public function showDetails($id) {
+    public function showDetails($orderId) {
         try {
-            //$this->auth->checkPermission('order', 'read');
-            try{
-                $role =$this->auth->getRole();
-                $id = $this->auth->getId();
-                if ($role !="customer" && $role != "manager" ){
+            try {
+                $role = $this->auth->getRole();
+                $userId = $this->auth->getId(); // Store user ID separately
+                if ($role != "customer" && $role != "manager") {
                     Response::json(403, ['error' => 'Invalid role']);
-                } 
-            }
-            catch (Exception $e){
+                }
+            } catch (Exception $e) {
                 Response::json(401, ['error' => $e->getMessage()]);
             }
-            $details = $this->orderModel->getDetails($id);
-            if($role=="customer"){
-                if ($details['user_id'] != $id){
-                    Response::json(404, ['error' => 'User not ơn that order']);
+    
+            $details = $this->orderModel->getDetails($orderId); // Use original order ID
+            
+            if ($role == "customer") {
+                if ($details['user']['id'] != $userId) { // Compare with stored user ID
+                    Response::json(404, ['error' => 'User not on that order']);
                 }
             }
-            
-        
+    
             if ($details) {
                 Response::json(200, $details);
-            } else {
-                Response::json(404, ['error' => 'Order details not found']);
             }
         } catch (Exception $e) {
             Response::json(500, ['error' => $e->getMessage()]);
